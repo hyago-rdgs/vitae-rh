@@ -26,7 +26,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 </p>
             </section>
 
-            <a class="btn btn-primary" href="<?= base_url('perfil/cadastrar'); ?>">
+            <a class="btn btn-success" href="<?= base_url('perfil/cadastrar'); ?>">
                 <i class="fa-solid fa-plus me-2" aria-hidden="true"></i>
                 Novo perfil
             </a>
@@ -58,7 +58,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                 <tr>
                                     <td class="ps-3 ps-lg-4">
                                         <div class="d-flex align-items-center gap-3">
-                                            <span class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded p-2"
+                                            <span
+                                                class="d-inline-flex align-items-center justify-content-center bg-success-subtle text-success rounded p-2"
                                                 aria-hidden="true">
                                                 <i class="fa-solid fa-user-shield"></i>
                                             </span>
@@ -97,11 +98,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                             (int) $perfil['codigo'] !==
                                             (int) $this->controle_acesso->get('perfil_codigo')
                                         ): ?>
-                                            <button class="btn btn-sm btn-light border text-danger excluir-perfil"
-                                                type="button"
+                                            <button class="btn btn-sm btn-light border text-danger excluir-perfil" type="button"
                                                 data-codigo="<?= $perfil['codigo']; ?>"
-                                                data-nome="<?= html_escape($perfil['nome']); ?>"
-                                                data-bs-toggle="modal"
+                                                data-nome="<?= html_escape($perfil['nome']); ?>" data-bs-toggle="modal"
                                                 data-bs-target="#modalExcluirPerfil"
                                                 aria-label="Excluir <?= html_escape($perfil['nome']); ?>">
                                                 <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
@@ -120,7 +119,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     <i class="fa-solid fa-user-shield fa-2x text-secondary mb-3" aria-hidden="true"></i>
                     <h2 class="h5 fw-semibold">Nenhum perfil cadastrado</h2>
                     <p class="text-secondary mb-4">Cadastre um perfil para configurar as permissões.</p>
-                    <a class="btn btn-primary" href="<?= base_url('perfil/cadastrar'); ?>">
+                    <a class="btn btn-success" href="<?= base_url('perfil/cadastrar'); ?>">
                         Cadastrar perfil
                     </a>
                 </div>
@@ -128,8 +127,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <?php endif; ?>
     </main>
 
-    <div class="modal fade" id="modalExcluirPerfil" tabindex="-1"
-        aria-labelledby="modalExcluirPerfilLabel" aria-hidden="true">
+    <div class="modal fade" id="modalExcluirPerfil" tabindex="-1" aria-labelledby="modalExcluirPerfilLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-sm">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header border-0 pb-0">

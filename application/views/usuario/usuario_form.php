@@ -27,20 +27,6 @@
             </section>
         </header>
 
-        <nav aria-label="Caminho do usuário" class="mb-4">
-            <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item">
-                    <a class="text-decoration-none" href="<?= base_url('usuario'); ?>">
-                        <i class="fa-solid fa-users me-1" aria-hidden="true"></i>
-                        Usuários
-                    </a>
-                </li>
-                <li class="breadcrumb-item active" aria-current="page">
-                    <?= $modo_edicao ? 'Editar' : 'Cadastrar'; ?>
-                </li>
-            </ol>
-        </nav>
-
         <section aria-labelledby="dados-usuario-title" class="card border shadow-sm">
             <div class="card-body p-4">
                 <div class="mb-4">
@@ -130,8 +116,8 @@
                     <hr class="my-4">
 
                     <div class="d-flex flex-column-reverse flex-sm-row justify-content-sm-end gap-2">
-                        <button class="btn btn-light border" id="cancelar" type="button">Voltar</button>
-                        <button class="btn btn-primary" type="submit" id="salvar">
+                        <button class="btn btn-light border" id="voltar" type="button">Voltar</button>
+                        <button class="btn btn-success" type="submit" id="salvar">
                             <?= $modo_edicao ? 'Salvar alterações' : 'Cadastrar usuário'; ?>
                         </button>
                     </div>
@@ -156,7 +142,7 @@
         const base_url = '<?= base_url(); ?>';
 
         $(document).ready(function () {
-            $('#cancelar').click(function () {
+            $('#voltar').click(function () {
                 if (window.history.length > 1) {
                     window.history.back();
                     return;

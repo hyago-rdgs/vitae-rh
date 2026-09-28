@@ -22,25 +22,16 @@
                     Cadastre e gerencie os usuários com acesso ao sistema.
                 </p>
             </section>
-            <a class="btn btn-primary flex-shrink-0" href="<?= base_url('usuario/cadastrar'); ?>">
+            <a class="btn btn-success flex-shrink-0" href="<?= base_url('usuario/cadastrar'); ?>">
                 <i class="fa-solid fa-plus me-2" aria-hidden="true"></i>
                 Novo usuário
             </a>
         </header>
 
-        <nav aria-label="Caminho do usuário" class="mb-4">
-            <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item active" aria-current="page">
-                    <i class="fa-solid fa-users me-1" aria-hidden="true"></i>
-                    Usuários
-                </li>
-            </ol>
-        </nav>
-
         <section aria-labelledby="filtros-title" class="card border shadow-sm mb-4">
             <div class="card-body">
                 <h2 class="h6 fw-semibold mb-3" id="filtros-title">Filtros</h2>
-                <form action="#" method="get">
+                <form>
                     <div class="row g-3 align-items-end">
                         <div class="col-12 col-md-7 col-lg-7">
                             <label class="form-label" for="termo">Buscar usuário</label>
@@ -63,7 +54,7 @@
                         </div>
                         <div class="col-12 col-sm-6 col-md-3 col-lg-3">
                             <div class="d-flex flex-column flex-sm-row gap-2">
-                                <a class="btn btn-primary flex-fill" id="filtrar" role="button">
+                                <a class="btn btn-success flex-fill" id="filtrar" role="button">
                                     <i class="fa-solid fa-filter me-2"></i>
                                     Filtrar
                                 </a>
@@ -101,13 +92,16 @@
                                 <tr>
                                     <td class="ps-3 ps-lg-4">
                                         <div class="d-flex align-items-center gap-3">
-                                            <span class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded p-2"
-                                                aria-hidden="true">
-                                                <i class="fa-regular fa-user"></i>
-                                            </span>
-                                            <span class="fw-semibold">
-                                                <?= htmlspecialchars($usuario['nome'], ENT_QUOTES, 'UTF-8'); ?>
-                                            </span>
+                                            <a class="text-decoration-none fw-semibold text-dark" href="<?= base_url('usuario/atualizar/' . $usuario['codigo']); ?>">
+                                                <span
+                                                    class="d-inline-flex align-items-center justify-content-center bg-success-subtle text-success rounded p-2"
+                                                    aria-hidden="true">
+                                                    <i class="fa-regular fa-user"></i>
+                                                </span>
+                                                <span class="fw-semibold">
+                                                    <?= htmlspecialchars($usuario['nome'], ENT_QUOTES, 'UTF-8'); ?>
+                                                </span>
+                                            </a>
                                         </div>
                                     </td>
                                     <td>
@@ -183,11 +177,11 @@
                                         <?php if ($i == 1 || $i == $total_paginas || ($i >= $pagina_atual - $adjacentes && $i <= $pagina_atual + $adjacentes)): ?>
                                             <?php if ($i == $pagina_atual): ?>
                                                 <li aria-current="page" class="page-item active">
-                                                    <span class="page-link bg-primary"><?= $i; ?></span>
+                                                    <span class="page-link bg-success"><?= $i; ?></span>
                                                 </li>
                                             <?php else: ?>
                                                 <li class="page-item">
-                                                    <a class="page-link text-primary" href="<?= $gerar_url($i); ?>"><?= $i; ?></a>
+                                                    <a class="page-link text-success" href="<?= $gerar_url($i); ?>"><?= $i; ?></a>
                                                 </li>
                                             <?php endif; ?>
                                         <?php endif; ?>
@@ -226,7 +220,7 @@
                     </div>
                     <h2 class="h5 fw-semibold" id="estado-vazio">Nenhum usuário cadastrado</h2>
                     <p class="text-secondary mb-4">Cadastre o primeiro usuário para permitir o acesso ao sistema.</p>
-                    <a class="btn btn-primary" href="<?= base_url('usuario/cadastrar'); ?>">
+                    <a class="btn btn-success" href="<?= base_url('usuario/cadastrar'); ?>">
                         <i class="fa-solid fa-plus me-2" aria-hidden="true"></i>
                         Cadastrar usuário
                     </a>
@@ -235,7 +229,8 @@
         <?php endif; ?>
     </main>
 
-    <div class="modal fade" id="modalExcluirUsuario" tabindex="-1" aria-labelledby="modalExcluirUsuarioLabel" aria-hidden="true">
+    <div class="modal fade" id="modalExcluirUsuario" tabindex="-1" aria-labelledby="modalExcluirUsuarioLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-sm">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header border-0 pb-0">

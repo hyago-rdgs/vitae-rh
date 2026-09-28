@@ -25,19 +25,6 @@
             </p>
         </header>
 
-        <nav aria-label="Caminho do perfil" class="mb-4">
-            <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item">
-                    <a class="text-decoration-none" href="<?= base_url('perfil'); ?>">
-                        Perfis de acesso
-                    </a>
-                </li>
-                <li class="breadcrumb-item active" aria-current="page">
-                    <?= $modo_edicao ? 'Configurar' : 'Cadastrar'; ?>
-                </li>
-            </ol>
-        </nav>
-
         <form id="formulario" method="post" novalidate>
             <div id="alerta-formulario" class="alert alert-danger d-none" role="alert"></div>
 
@@ -138,8 +125,8 @@
             </section>
 
             <div class="d-flex flex-column-reverse flex-sm-row justify-content-sm-end gap-2 mt-4">
-                <a class="btn btn-light border" href="<?= base_url('perfil'); ?>">Voltar</a>
-                <button class="btn btn-primary" type="submit" id="salvar">
+                <button class="btn btn-light border" id="voltar" type="button">Voltar</button>
+                <button class="btn btn-success" type="submit" id="salvar">
                     <?= $modo_edicao ? 'Salvar configurações' : 'Cadastrar perfil'; ?>
                 </button>
             </div>
@@ -149,8 +136,17 @@
     <?php $this->load->view('js'); ?>
 
     <script>
+        const base_url = '<?= base_url(); ?>';
+
         $(document).ready(function () {
-            const base_url = '<?= base_url(); ?>';
+            $('#voltar').click(function () {
+                if (window.history.length > 1) {
+                    window.history.back();
+                    return;
+                }
+
+                window.location = base_url + 'usuario';
+            });
 
             $('#selecionar_todas').on('click', function () {
                 $('.permissao').prop('checked', true);

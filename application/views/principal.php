@@ -24,158 +24,28 @@
             </header>
 
             <div class="row g-3">
-                <?php if ($this->controle_acesso->tem_permissao('documentos.visualizar')): ?>
-                <div class="col-12 col-md-6 col-xl-4">
-                    <a class="card h-100 border shadow-sm text-decoration-none text-body"
-                        href="<?= base_url('documento'); ?>">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <span
-                                    class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded p-3"
-                                    aria-hidden="true">
-                                    <i class="fa-regular fa-file-lines fa-lg"></i>
-                                </span>
-                                <i class="fa-solid fa-arrow-right text-body-tertiary" aria-hidden="true"></i>
-                            </div>
-                            <h3 class="h6 fw-semibold">Documentos</h3>
-                            <p class="small text-body-secondary mb-0">
-                                Cadastre, consulte, atualize e gerencie documentos do acervo.
-                            </p>
-                        </div>
-                    </a>
-                </div>
-                <?php endif; ?>
+                <?php if ($this->controle_acesso->tem_permissao('modulo.acao')): ?>
+                    <!-- EXEMPLO DE CARD: -->
 
-                <?php if ($this->controle_acesso->tem_permissao('movimentacoes.visualizar')): ?>
-                <div class="col-12 col-md-6 col-xl-4">
-                    <a class="card h-100 border shadow-sm text-decoration-none text-body"
-                        href="<?= base_url('movimentacao'); ?>">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <span
-                                    class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded p-3"
-                                    aria-hidden="true">
-                                    <i class="fa-solid fa-right-left fa-lg"></i>
-                                </span>
-                                <i class="fa-solid fa-arrow-right text-body-tertiary" aria-hidden="true"></i>
+                    <!-- <div class="col-12 col-md-6 col-xl-4">
+                        <a class="card h-100 border shadow-sm text-decoration-none text-body"
+                            href="<?= base_url(''); ?>">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <span
+                                        class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded p-3"
+                                        aria-hidden="true">
+                                        <i class="fa-solid fa-chart-column fa-lg"></i>
+                                    </span>
+                                    <i class="fa-solid fa-arrow-right text-body-tertiary" aria-hidden="true"></i>
+                                </div>
+                                <h3 class="h6 fw-semibold">Dashboard</h3>
+                                <p class="small text-body-secondary mb-0">
+                                    Acompanhe indicadores do acervo, digitalização e movimentações.
+                                </p>
                             </div>
-                            <h3 class="h6 fw-semibold">Movimentações</h3>
-                            <p class="small text-body-secondary mb-0">
-                                Transfira, retire, devolva e acompanhe a custódia dos documentos.
-                            </p>
-                        </div>
-                    </a>
-                </div>
-                <?php endif; ?>
-
-                <?php if ($this->controle_acesso->tem_permissao('pesquisa.acessar')): ?>
-                <div class="col-12 col-md-6 col-xl-4">
-                    <a class="card h-100 border shadow-sm text-decoration-none text-body"
-                        href="<?= base_url('pesquisa'); ?>">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <span
-                                    class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded p-3"
-                                    aria-hidden="true">
-                                    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
-                                </span>
-                                <i class="fa-solid fa-arrow-right text-body-tertiary" aria-hidden="true"></i>
-                            </div>
-                            <h3 class="h6 fw-semibold">Pesquisa</h3>
-                            <p class="small text-body-secondary mb-0">
-                                Combine critérios, tipos, localizações e metadados para localizar registros.
-                            </p>
-                        </div>
-                    </a>
-                </div>
-                <?php endif; ?>
-
-                <?php if ($this->controle_acesso->tem_permissao('localizacoes.visualizar')): ?>
-                <div class="col-12 col-md-6 col-xl-4">
-                    <a class="card h-100 border shadow-sm text-decoration-none text-body"
-                        href="<?= base_url('localizacao'); ?>">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <span
-                                    class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded p-3"
-                                    aria-hidden="true">
-                                    <i class="fa-solid fa-location-dot fa-lg"></i>
-                                </span>
-                                <i class="fa-solid fa-arrow-right text-body-tertiary" aria-hidden="true"></i>
-                            </div>
-                            <h3 class="h6 fw-semibold">Localizações</h3>
-                            <p class="small text-body-secondary mb-0">
-                                Navegue pela estrutura física e organize onde cada documento está armazenado.
-                            </p>
-                        </div>
-                    </a>
-                </div>
-                <?php endif; ?>
-
-                <?php if ($this->controle_acesso->tem_permissao('tipos_documento.gerenciar')): ?>
-                <div class="col-12 col-md-6 col-xl-4">
-                    <a class="card h-100 border shadow-sm text-decoration-none text-body"
-                        href="<?= base_url('tipo_documento'); ?>">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <span
-                                    class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded p-3"
-                                    aria-hidden="true">
-                                    <i class="fa-solid fa-folder-tree fa-lg"></i>
-                                </span>
-                                <i class="fa-solid fa-arrow-right text-body-tertiary" aria-hidden="true"></i>
-                            </div>
-                            <h3 class="h6 fw-semibold">Tipos de documento</h3>
-                            <p class="small text-body-secondary mb-0">
-                                Defina categorias documentais e os metadados associados a cada tipo.
-                            </p>
-                        </div>
-                    </a>
-                </div>
-                <?php endif; ?>
-
-                <?php if ($this->controle_acesso->tem_permissao('metadados.gerenciar')): ?>
-                <div class="col-12 col-md-6 col-xl-4">
-                    <a class="card h-100 border shadow-sm text-decoration-none text-body"
-                        href="<?= base_url('metadado'); ?>">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <span
-                                    class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded p-3"
-                                    aria-hidden="true">
-                                    <i class="fa-solid fa-tags fa-lg"></i>
-                                </span>
-                                <i class="fa-solid fa-arrow-right text-body-tertiary" aria-hidden="true"></i>
-                            </div>
-                            <h3 class="h6 fw-semibold">Metadados</h3>
-                            <p class="small text-body-secondary mb-0">
-                                Gerencie os campos personalizados usados na classificação dos documentos.
-                            </p>
-                        </div>
-                    </a>
-                </div>
-                <?php endif; ?>
-
-                <?php if ($this->controle_acesso->tem_permissao('dashboard.visualizar')): ?>
-                <div class="col-12 col-md-6 col-xl-4">
-                    <a class="card h-100 border shadow-sm text-decoration-none text-body"
-                        href="<?= base_url('dashboard'); ?>">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <span
-                                    class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded p-3"
-                                    aria-hidden="true">
-                                    <i class="fa-solid fa-chart-column fa-lg"></i>
-                                </span>
-                                <i class="fa-solid fa-arrow-right text-body-tertiary" aria-hidden="true"></i>
-                            </div>
-                            <h3 class="h6 fw-semibold">Dashboard</h3>
-                            <p class="small text-body-secondary mb-0">
-                                Acompanhe indicadores do acervo, digitalização e movimentações.
-                            </p>
-                        </div>
-                    </a>
-                </div>
+                        </a>
+                    </div> -->
                 <?php endif; ?>
             </div>
         </section>
