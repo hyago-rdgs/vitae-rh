@@ -4,8 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Tela inicial do sistema e-Doc">
-    <title>Início | e-Doc</title>
+    <meta name="description" content="Tela inicial do sistema Vitae RH">
+    <title>Início | Vitae RH</title>
 
     <?php $this->load->view('css'); ?>
 </head>
@@ -19,7 +19,7 @@
             <header class="mb-3">
                 <h2 class="h5 mb-1" id="modulos-title">Módulos</h2>
                 <p class="small text-body-secondary mb-0">
-                    Acesse as principais áreas de gerenciamento do e-Doc.
+                    Acesse as principais áreas de gerenciamento do Vitae RH.
                 </p>
             </header>
 

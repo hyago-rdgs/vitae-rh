@@ -7,8 +7,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Perfis de acesso do sistema e-Doc">
-    <title>Perfis de acesso | e-Doc</title>
+    <meta name="description" content="Perfis de acesso do sistema Vitae RH">
+    <title>Perfis de acesso | Vitae RH</title>
 
     <?php $this->load->view('css'); ?>
 </head>

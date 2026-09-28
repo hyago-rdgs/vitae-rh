@@ -3,12 +3,12 @@
   <nav class="navbar navbar-expand-lg" aria-label="Navegação principal">
     <section class="container-fluid px-3 px-lg-4">
       <a class="navbar-brand d-flex align-items-center gap-2 fw-semibold" href="<?= base_url(); ?>"
-        aria-label="e-Doc — página inicial">
-        <span class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded p-2"
+        aria-label="Vitae RH — página inicial">
+        <span class="d-inline-flex align-items-center justify-content-center bg-success text-white rounded p-2"
           aria-hidden="true">
-          <i class="fa-solid fa-file-shield"></i>
+          <i class="fa-solid fa-people-group"></i>
         </span>
-        <span>e-Doc</span>
+        <span>Vitae RH</span>
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navegacao-principal"
         aria-controls="navegacao-principal" aria-expanded="false" aria-label="Abrir navegação"><span
@@ -18,8 +18,7 @@
           <?php if ($this->controle_acesso->tem_permissao('documentos.visualizar')): ?>
             <li class="nav-item">
               <a class="nav-link <?= $modulo_atual == 'documento' ? 'active fw-semibold' : ''; ?>"
-                <?= $modulo_atual == 'documento' ? 'aria-current="page"' : ''; ?>
-                href="<?= base_url('documento'); ?>">
+                <?= $modulo_atual == 'documento' ? 'aria-current="page"' : ''; ?> href="<?= base_url('documento'); ?>">
                 Documentos
               </a>
             </li>
@@ -28,8 +27,7 @@
           <?php if ($this->controle_acesso->tem_permissao('movimentacoes.visualizar')): ?>
             <li class="nav-item">
               <a class="nav-link <?= $modulo_atual == 'movimentacao' ? 'active fw-semibold' : ''; ?>"
-                <?= $modulo_atual == 'movimentacao' ? 'aria-current="page"' : ''; ?>
-                href="<?= base_url('movimentacao'); ?>">
+                <?= $modulo_atual == 'movimentacao' ? 'aria-current="page"' : ''; ?> href="<?= base_url('movimentacao'); ?>">
                 Movimentações
               </a>
             </li>
@@ -38,8 +36,7 @@
           <?php if ($this->controle_acesso->tem_permissao('pesquisa.acessar')): ?>
             <li class="nav-item">
               <a class="nav-link <?= $modulo_atual == 'pesquisa' ? 'active fw-semibold' : ''; ?>"
-                <?= $modulo_atual == 'pesquisa' ? 'aria-current="page"' : ''; ?>
-                href="<?= base_url('pesquisa'); ?>">
+                <?= $modulo_atual == 'pesquisa' ? 'aria-current="page"' : ''; ?> href="<?= base_url('pesquisa'); ?>">
                 Pesquisa
               </a>
             </li>
@@ -48,8 +45,7 @@
           <?php if ($this->controle_acesso->tem_permissao('dashboard.visualizar')): ?>
             <li class="nav-item">
               <a class="nav-link <?= $modulo_atual == 'dashboard' ? 'active fw-semibold' : ''; ?>"
-                <?= $modulo_atual == 'dashboard' ? 'aria-current="page"' : ''; ?>
-                href="<?= base_url('dashboard'); ?>">
+                <?= $modulo_atual == 'dashboard' ? 'aria-current="page"' : ''; ?> href="<?= base_url('dashboard'); ?>">
                 Dashboard
               </a>
             </li>
@@ -58,8 +54,7 @@
           <?php if ($this->controle_acesso->tem_permissao('relatorios.visualizar')): ?>
             <li class="nav-item">
               <a class="nav-link <?= $modulo_atual == 'relatorio' ? 'active fw-semibold' : ''; ?>"
-                <?= $modulo_atual == 'relatorio' ? 'aria-current="page"' : ''; ?>
-                href="<?= base_url('relatorio'); ?>">
+                <?= $modulo_atual == 'relatorio' ? 'aria-current="page"' : ''; ?> href="<?= base_url('relatorio'); ?>">
                 Relatórios
               </a>
             </li>
@@ -78,8 +73,7 @@
           <?php if ($this->controle_acesso->tem_permissao('metadados.gerenciar')): ?>
             <li class="nav-item">
               <a class="nav-link <?= $modulo_atual == 'metadado' ? 'active fw-semibold' : ''; ?>"
-                <?= $modulo_atual == 'metadado' ? 'aria-current="page"' : ''; ?>
-                href="<?= base_url('metadado'); ?>">
+                <?= $modulo_atual == 'metadado' ? 'aria-current="page"' : ''; ?> href="<?= base_url('metadado'); ?>">
                 Metadados
               </a>
             </li>
@@ -88,8 +82,7 @@
           <?php if ($this->controle_acesso->tem_permissao('localizacoes.visualizar')): ?>
             <li class="nav-item">
               <a class="nav-link <?= $modulo_atual == 'localizacao' ? 'active fw-semibold' : ''; ?>"
-                <?= $modulo_atual == 'localizacao' ? 'aria-current="page"' : ''; ?>
-                href="<?= base_url('localizacao'); ?>">
+                <?= $modulo_atual == 'localizacao' ? 'aria-current="page"' : ''; ?> href="<?= base_url('localizacao'); ?>">
                 Localizações
               </a>
             </li>
@@ -98,8 +91,7 @@
           <?php if ($this->controle_acesso->tem_permissao('usuarios.gerenciar')): ?>
             <li class="nav-item">
               <a class="nav-link <?= $modulo_atual == 'usuario' ? 'active fw-semibold' : ''; ?>"
-                <?= $modulo_atual == 'usuario' ? 'aria-current="page"' : ''; ?>
-                href="<?= base_url('usuario'); ?>">
+                <?= $modulo_atual == 'usuario' ? 'aria-current="page"' : ''; ?> href="<?= base_url('usuario'); ?>">
                 Usuários
               </a>
             </li>
@@ -107,9 +99,7 @@
 
           <?php if ($this->controle_acesso->tem_permissao('perfis.gerenciar')): ?>
             <li class="nav-item">
-              <a class="nav-link <?= $modulo_atual == 'perfil' ? 'active fw-semibold' : ''; ?>"
-                <?= $modulo_atual == 'perfil' ? 'aria-current="page"' : ''; ?>
-                href="<?= base_url('perfil'); ?>">
+              <a class="nav-link <?= $modulo_atual == 'perfil' ? 'active fw-semibold' : ''; ?>" <?= $modulo_atual == 'perfil' ? 'aria-current="page"' : ''; ?> href="<?= base_url('perfil'); ?>">
                 Perfis
               </a>
             </li>

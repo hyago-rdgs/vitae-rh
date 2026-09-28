@@ -5,8 +5,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Configuração de perfil de acesso do sistema e-Doc">
-    <title><?= $modo_edicao ? 'Configurar perfil' : 'Novo perfil'; ?> | e-Doc</title>
+    <meta name="description" content="Configuração de perfil de acesso do sistema Vitae RH">
+    <title><?= $modo_edicao ? 'Configurar perfil' : 'Novo perfil'; ?> | Vitae RH</title>
 
     <?php $this->load->view('css'); ?>
 </head>

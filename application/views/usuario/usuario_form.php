@@ -5,8 +5,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Formulário de usuário do sistema e-Doc">
-    <title><?= $modo_edicao ? 'Editar usuário' : 'Novo usuário'; ?> | e-Doc</title>
+    <meta name="description" content="Formulário de usuário do sistema Vitae RH">
+    <title><?= $modo_edicao ? 'Editar usuário' : 'Novo usuário'; ?> | Vitae RH</title>
 
     <?php $this->load->view('css'); ?>
 </head>

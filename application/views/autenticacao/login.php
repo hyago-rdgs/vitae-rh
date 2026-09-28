@@ -4,8 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Acesso ao sistema de gerenciamento eletrônico de documentos.">
-    <title>Acessar sistema | e-Doc</title>
+    <meta name="description" content="Acesso ao sistema de Sistema de Gestão de Pessoas.">
+    <title>Acessar sistema | Vitae RH</title>
 
     <?php $this->load->view('css'); ?>
 </head>
@@ -20,14 +20,14 @@
                             <header class="text-center mb-4">
                                 <div class="mb-3" aria-hidden="true">
                                     <span
-                                        class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded p-3">
-                                        <i class="fa-solid fa-file-shield fs-4"></i>
+                                        class="d-inline-flex align-items-center justify-content-center bg-success text-white rounded p-3">
+                                        <i class="fa-solid fa-people-group fs-4"></i>
                                     </span>
                                 </div>
 
-                                <p class="fw-bold text-dark mb-1">e-Doc</p>
+                                <p class="fw-bold text-dark mb-1">Vitae RH</p>
                                 <p class="small text-secondary mb-4">
-                                    Gerenciamento eletrônico de documentos
+                                    Sistema de Gestão de Pessoas
                                 </p>
 
                                 <h1 class="h3 fw-bold text-dark mb-2" id="login-title">
@@ -73,7 +73,7 @@
                                     </div>
                                 </div>
 
-                                <button class="btn btn-primary w-100" type="submit" id="entrar">
+                                <button class="btn btn-success w-100" type="submit" id="entrar">
                                     <i class="fa-solid fa-arrow-right-to-bracket me-2" aria-hidden="true"></i>
                                     Entrar
                                 </button>
