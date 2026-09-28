@@ -1,0 +1,148 @@
+<?php $modulo_atual = $this->uri->segment(1); ?>
+<header class="bg-white border-bottom sticky-top">
+  <nav class="navbar navbar-expand-lg" aria-label="Navegação principal">
+    <section class="container-fluid px-3 px-lg-4">
+      <a class="navbar-brand d-flex align-items-center gap-2 fw-semibold" href="<?= base_url(); ?>"
+        aria-label="e-Doc — página inicial">
+        <span class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded p-2"
+          aria-hidden="true">
+          <i class="fa-solid fa-file-shield"></i>
+        </span>
+        <span>e-Doc</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navegacao-principal"
+        aria-controls="navegacao-principal" aria-expanded="false" aria-label="Abrir navegação"><span
+          class="navbar-toggler-icon"></span></button>
+      <section class="collapse navbar-collapse" id="navegacao-principal">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4 gap-lg-1">
+          <?php if ($this->controle_acesso->tem_permissao('documentos.visualizar')): ?>
+            <li class="nav-item">
+              <a class="nav-link <?= $modulo_atual == 'documento' ? 'active fw-semibold' : ''; ?>"
+                <?= $modulo_atual == 'documento' ? 'aria-current="page"' : ''; ?>
+                href="<?= base_url('documento'); ?>">
+                Documentos
+              </a>
+            </li>
+          <?php endif; ?>
+
+          <?php if ($this->controle_acesso->tem_permissao('movimentacoes.visualizar')): ?>
+            <li class="nav-item">
+              <a class="nav-link <?= $modulo_atual == 'movimentacao' ? 'active fw-semibold' : ''; ?>"
+                <?= $modulo_atual == 'movimentacao' ? 'aria-current="page"' : ''; ?>
+                href="<?= base_url('movimentacao'); ?>">
+                Movimentações
+              </a>
+            </li>
+          <?php endif; ?>
+
+          <?php if ($this->controle_acesso->tem_permissao('pesquisa.acessar')): ?>
+            <li class="nav-item">
+              <a class="nav-link <?= $modulo_atual == 'pesquisa' ? 'active fw-semibold' : ''; ?>"
+                <?= $modulo_atual == 'pesquisa' ? 'aria-current="page"' : ''; ?>
+                href="<?= base_url('pesquisa'); ?>">
+                Pesquisa
+              </a>
+            </li>
+          <?php endif; ?>
+
+          <?php if ($this->controle_acesso->tem_permissao('dashboard.visualizar')): ?>
+            <li class="nav-item">
+              <a class="nav-link <?= $modulo_atual == 'dashboard' ? 'active fw-semibold' : ''; ?>"
+                <?= $modulo_atual == 'dashboard' ? 'aria-current="page"' : ''; ?>
+                href="<?= base_url('dashboard'); ?>">
+                Dashboard
+              </a>
+            </li>
+          <?php endif; ?>
+
+          <?php if ($this->controle_acesso->tem_permissao('relatorios.visualizar')): ?>
+            <li class="nav-item">
+              <a class="nav-link <?= $modulo_atual == 'relatorio' ? 'active fw-semibold' : ''; ?>"
+                <?= $modulo_atual == 'relatorio' ? 'aria-current="page"' : ''; ?>
+                href="<?= base_url('relatorio'); ?>">
+                Relatórios
+              </a>
+            </li>
+          <?php endif; ?>
+
+          <?php if ($this->controle_acesso->tem_permissao('tipos_documento.gerenciar')): ?>
+            <li class="nav-item">
+              <a class="nav-link <?= $modulo_atual == 'tipo_documento' ? 'active fw-semibold' : ''; ?>"
+                <?= $modulo_atual == 'tipo_documento' ? 'aria-current="page"' : ''; ?>
+                href="<?= base_url('tipo_documento'); ?>">
+                Tipos de documento
+              </a>
+            </li>
+          <?php endif; ?>
+
+          <?php if ($this->controle_acesso->tem_permissao('metadados.gerenciar')): ?>
+            <li class="nav-item">
+              <a class="nav-link <?= $modulo_atual == 'metadado' ? 'active fw-semibold' : ''; ?>"
+                <?= $modulo_atual == 'metadado' ? 'aria-current="page"' : ''; ?>
+                href="<?= base_url('metadado'); ?>">
+                Metadados
+              </a>
+            </li>
+          <?php endif; ?>
+
+          <?php if ($this->controle_acesso->tem_permissao('localizacoes.visualizar')): ?>
+            <li class="nav-item">
+              <a class="nav-link <?= $modulo_atual == 'localizacao' ? 'active fw-semibold' : ''; ?>"
+                <?= $modulo_atual == 'localizacao' ? 'aria-current="page"' : ''; ?>
+                href="<?= base_url('localizacao'); ?>">
+                Localizações
+              </a>
+            </li>
+          <?php endif; ?>
+
+          <?php if ($this->controle_acesso->tem_permissao('usuarios.gerenciar')): ?>
+            <li class="nav-item">
+              <a class="nav-link <?= $modulo_atual == 'usuario' ? 'active fw-semibold' : ''; ?>"
+                <?= $modulo_atual == 'usuario' ? 'aria-current="page"' : ''; ?>
+                href="<?= base_url('usuario'); ?>">
+                Usuários
+              </a>
+            </li>
+          <?php endif; ?>
+
+          <?php if ($this->controle_acesso->tem_permissao('perfis.gerenciar')): ?>
+            <li class="nav-item">
+              <a class="nav-link <?= $modulo_atual == 'perfil' ? 'active fw-semibold' : ''; ?>"
+                <?= $modulo_atual == 'perfil' ? 'aria-current="page"' : ''; ?>
+                href="<?= base_url('perfil'); ?>">
+                Perfis
+              </a>
+            </li>
+          <?php endif; ?>
+
+          <?php if ($this->controle_acesso->tem_permissao('auditoria.visualizar')): ?>
+            <li class="nav-item">
+              <a class="nav-link <?= $modulo_atual == 'auditoria' ? 'active fw-semibold' : ''; ?>"
+                <?= $modulo_atual == 'auditoria' ? 'aria-current="page"' : ''; ?>
+                href="<?= base_url('auditoria'); ?>">
+                Auditoria
+              </a>
+            </li>
+          <?php endif; ?>
+        </ul>
+        <ul class="navbar-nav">
+          <li class="nav-item dropdown">
+            <button class="btn btn-light border dropdown-toggle d-flex align-items-center gap-2" type="button"
+              data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-regular fa-circle-user"
+                aria-hidden="true"></i>
+              <span class="d-flex flex-column text-start">
+                <span><?= html_escape($this->controle_acesso->get('nome')); ?></span>
+                <small class="text-body-secondary">
+                  <?= html_escape($this->controle_acesso->get('perfil_nome')); ?>
+                </small>
+              </span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item log-out" href="<?= base_url('autenticacao/logout'); ?>">Sair</a></li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+    </section>
+  </nav>
+</header>
