@@ -217,6 +217,14 @@
                                                     </div>
 
                                                     <div class="d-flex flex-wrap justify-content-lg-end align-items-start gap-2">
+                                                        <button class="btn btn-sm btn-success novo-campo" type="button"
+                                                            data-grupo-codigo="<?= $grupo['codigo']; ?>"
+                                                            data-grupo-nome="<?= html_escape($grupo['nome']); ?>"
+                                                            data-bs-toggle="modal" data-bs-target="#modalCampo">
+                                                            <i class="fa-solid fa-plus me-1" aria-hidden="true"></i>
+                                                            Novo campo
+                                                        </button>
+
                                                         <button class="btn btn-sm btn-light border mover-grupo" type="button"
                                                             data-codigo="<?= $grupo['codigo']; ?>" data-direcao="subir"
                                                             <?= $indice_grupo === 0 ? 'disabled' : ''; ?>
@@ -253,6 +261,106 @@
                                                             <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
                                                         </button>
                                                     </div>
+                                                </div>
+
+                                                <?php $campos_grupo = $campos_por_grupo[$grupo['codigo']] ?? []; ?>
+
+                                                <div class="border rounded mt-3">
+                                                    <div class="px-3 py-2 border-bottom bg-body-tertiary">
+                                                        <h6 class="small fw-semibold mb-0">Campos do grupo</h6>
+                                                    </div>
+
+                                                    <?php if (!empty($campos_grupo)): ?>
+                                                        <div class="list-group list-group-flush">
+                                                            <?php foreach ($campos_grupo as $indice_campo => $campo): ?>
+                                                                <div class="list-group-item px-3 py-2">
+                                                                    <div class="d-flex flex-column flex-lg-row justify-content-between gap-2">
+                                                                        <div class="d-flex align-items-start gap-2">
+                                                                            <span class="badge text-bg-light border mt-1">
+                                                                                <?= (int) $campo['ordem']; ?>
+                                                                            </span>
+
+                                                                            <div>
+                                                                                <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                                                                                    <span class="small fw-semibold">
+                                                                                        <?= html_escape($campo['nome']); ?>
+                                                                                    </span>
+                                                                                    <span class="badge text-bg-light border">
+                                                                                        <?= html_escape($tipos_campos[$campo['tipo']] ?? $campo['tipo']); ?>
+                                                                                    </span>
+
+                                                                                    <?php if ((int) $campo['obrigatorio'] === 1): ?>
+                                                                                        <span class="badge text-bg-warning">Obrigatório</span>
+                                                                                    <?php endif; ?>
+
+                                                                                    <?php if ((int) $campo['filtravel'] === 1): ?>
+                                                                                        <span class="badge text-bg-info">Filtrável</span>
+                                                                                    <?php endif; ?>
+
+                                                                                    <?php if ((int) $campo['ativo'] !== 1): ?>
+                                                                                        <span class="badge text-bg-secondary">Inativo</span>
+                                                                                    <?php endif; ?>
+                                                                                </div>
+
+                                                                                <?php if (!empty($campo['texto_ajuda'])): ?>
+                                                                                    <span class="small text-secondary">
+                                                                                        <?= html_escape($campo['texto_ajuda']); ?>
+                                                                                    </span>
+                                                                                <?php endif; ?>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="d-flex flex-wrap justify-content-lg-end align-items-start gap-2">
+                                                                            <button class="btn btn-sm btn-light border mover-campo" type="button"
+                                                                                data-codigo="<?= $campo['codigo']; ?>" data-direcao="subir"
+                                                                                <?= $indice_campo === 0 ? 'disabled' : ''; ?>
+                                                                                aria-label="Mover <?= html_escape($campo['nome']); ?> para cima">
+                                                                                <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
+                                                                            </button>
+
+                                                                            <button class="btn btn-sm btn-light border mover-campo" type="button"
+                                                                                data-codigo="<?= $campo['codigo']; ?>" data-direcao="descer"
+                                                                                <?= $indice_campo === count($campos_grupo) - 1 ? 'disabled' : ''; ?>
+                                                                                aria-label="Mover <?= html_escape($campo['nome']); ?> para baixo">
+                                                                                <i class="fa-solid fa-arrow-down" aria-hidden="true"></i>
+                                                                            </button>
+
+                                                                            <button class="btn btn-sm btn-light border editar-campo" type="button"
+                                                                                data-codigo="<?= $campo['codigo']; ?>"
+                                                                                data-grupo-nome="<?= html_escape($grupo['nome']); ?>"
+                                                                                data-nome="<?= html_escape($campo['nome']); ?>"
+                                                                                data-tipo="<?= html_escape($campo['tipo']); ?>"
+                                                                                data-placeholder="<?= html_escape($campo['placeholder'] ?? ''); ?>"
+                                                                                data-texto-ajuda="<?= html_escape($campo['texto_ajuda'] ?? ''); ?>"
+                                                                                data-obrigatorio="<?= (int) $campo['obrigatorio']; ?>"
+                                                                                data-filtravel="<?= (int) $campo['filtravel']; ?>"
+                                                                                data-tamanho-maximo="<?= html_escape($campo['tamanho_maximo'] ?? ''); ?>"
+                                                                                data-numero-minimo="<?= html_escape($campo['numero_minimo'] ?? ''); ?>"
+                                                                                data-numero-maximo="<?= html_escape($campo['numero_maximo'] ?? ''); ?>"
+                                                                                data-data-minima="<?= html_escape($campo['data_minima'] ?? ''); ?>"
+                                                                                data-data-maxima="<?= html_escape($campo['data_maxima'] ?? ''); ?>"
+                                                                                data-ativo="<?= (int) $campo['ativo']; ?>"
+                                                                                data-bs-toggle="modal" data-bs-target="#modalCampo">
+                                                                                <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+                                                                            </button>
+
+                                                                            <button class="btn btn-sm btn-light border text-danger excluir-campo" type="button"
+                                                                                data-codigo="<?= $campo['codigo']; ?>"
+                                                                                data-nome="<?= html_escape($campo['nome']); ?>"
+                                                                                data-bs-toggle="modal" data-bs-target="#modalExcluirCampo"
+                                                                                aria-label="Excluir <?= html_escape($campo['nome']); ?>">
+                                                                                <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            <?php endforeach; ?>
+                                                        </div>
+                                                    <?php else: ?>
+                                                        <div class="px-3 py-2 text-center text-secondary small">
+                                                            Nenhum campo cadastrado neste grupo.
+                                                        </div>
+                                                    <?php endif; ?>
                                                 </div>
                                             </div>
                                         <?php endforeach; ?>
@@ -458,6 +566,173 @@
         </div>
     </div>
 
+    <div class="modal fade" id="modalCampo" tabindex="-1" aria-labelledby="modalCampoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header">
+                    <div>
+                        <h2 class="modal-title fs-5" id="modalCampoLabel">Novo campo</h2>
+                        <p class="small text-secondary mb-0" id="campo_grupo_nome"></p>
+                    </div>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+
+                <form id="formulario_campo" method="post" novalidate>
+                    <input id="campo_grupo_codigo" name="grupo_codigo" type="hidden">
+
+                    <div class="modal-body">
+                        <div id="alerta-campo" class="alert alert-danger d-none" role="alert"></div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-12 col-md-7">
+                                <label class="form-label" for="nome_campo">Nome</label>
+                                <input class="form-control" id="nome_campo" name="nome"
+                                    maxlength="100" required type="text">
+                            </div>
+
+                            <div class="col-12 col-md-5">
+                                <label class="form-label" for="tipo_campo">Tipo</label>
+                                <select class="form-select" id="tipo_campo" name="tipo" required>
+                                    <option value="">Selecione</option>
+                                    <?php foreach ($tipos_campos as $chave_tipo => $nome_tipo): ?>
+                                        <option value="<?= html_escape($chave_tipo); ?>">
+                                            <?= html_escape($nome_tipo); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" for="placeholder_campo">Placeholder</label>
+                                <input class="form-control" id="placeholder_campo" name="placeholder"
+                                    maxlength="150" type="text">
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" for="texto_ajuda_campo">Texto de ajuda</label>
+                                <input class="form-control" id="texto_ajuda_campo" name="texto_ajuda"
+                                    maxlength="255" type="text">
+                            </div>
+                        </div>
+
+                        <section class="border rounded p-3 mb-3 d-none" id="regras_texto_campo">
+                            <label class="form-label" for="tamanho_maximo_campo">Tamanho máximo</label>
+                            <input class="form-control" id="tamanho_maximo_campo" name="tamanho_maximo"
+                                min="1" max="65535" step="1" type="number">
+                        </section>
+
+                        <section class="border rounded p-3 mb-3 d-none" id="regras_numero_campo">
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <label class="form-label" for="numero_minimo_campo">Valor mínimo</label>
+                                    <input class="form-control" id="numero_minimo_campo"
+                                        name="numero_minimo" step="any" type="number">
+                                </div>
+
+                                <div class="col-6">
+                                    <label class="form-label" for="numero_maximo_campo">Valor máximo</label>
+                                    <input class="form-control" id="numero_maximo_campo"
+                                        name="numero_maximo" step="any" type="number">
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="border rounded p-3 mb-3 d-none" id="regras_data_campo">
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <label class="form-label" for="data_minima_campo">Data mínima</label>
+                                    <input class="form-control" id="data_minima_campo"
+                                        name="data_minima" type="date">
+                                </div>
+
+                                <div class="col-6">
+                                    <label class="form-label" for="data_maxima_campo">Data máxima</label>
+                                    <input class="form-control" id="data_maxima_campo"
+                                        name="data_maxima" type="date">
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="border rounded p-3 mb-3 d-none" id="opcoes_campo">
+                            <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
+                                <div>
+                                    <h3 class="h6 fw-semibold mb-1">Opções</h3>
+                                    <p class="small text-secondary mb-0">Cadastre pelo menos duas opções.</p>
+                                </div>
+                                <button class="btn btn-sm btn-light border" id="adicionar_opcao_campo" type="button">
+                                    <i class="fa-solid fa-plus me-1" aria-hidden="true"></i>
+                                    Adicionar opção
+                                </button>
+                            </div>
+
+                            <div class="vstack gap-2" id="lista_opcoes_campo"></div>
+                        </section>
+
+                        <div class="d-flex flex-column flex-md-row gap-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" id="obrigatorio_campo" name="obrigatorio"
+                                    type="checkbox" value="1">
+                                <label class="form-check-label" for="obrigatorio_campo">Campo obrigatório</label>
+                            </div>
+
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" id="filtravel_campo" name="filtravel"
+                                    type="checkbox" value="1">
+                                <label class="form-check-label" for="filtravel_campo">Disponível nos filtros</label>
+                            </div>
+
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" id="ativo_campo" name="ativo"
+                                    type="checkbox" value="1" checked>
+                                <label class="form-check-label" for="ativo_campo">Campo ativo</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-light border" type="button" data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+                        <button class="btn btn-success" type="submit" id="salvar_campo">
+                            Cadastrar campo
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalExcluirCampo" tabindex="-1"
+        aria-labelledby="modalExcluirCampoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0 pb-0">
+                    <h2 class="modal-title fs-5" id="modalExcluirCampoLabel">Excluir campo</h2>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+
+                <form id="formulario_exclusao_campo" method="post">
+                    <div class="modal-body">
+                        <div id="alerta-exclusao-campo" class="alert alert-danger d-none" role="alert"></div>
+                        <p class="mb-2">Deseja realmente excluir este campo?</p>
+                        <p class="fw-semibold mb-0" id="nome_campo_exclusao"></p>
+                    </div>
+
+                    <div class="modal-footer border-0 pt-0">
+                        <button class="btn btn-light border" type="button" data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+                        <button class="btn btn-danger" type="submit" id="confirmar_exclusao_campo">
+                            Excluir
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <div class="toast-container position-fixed bottom-0 end-0 p-3" aria-live="polite" aria-atomic="true">
         <div id="toast-feedback" class="toast border-0 shadow" role="status">
             <div class="toast-body d-flex align-items-center gap-3">
@@ -473,10 +748,20 @@
     <script>
         $(document).ready(function () {
             const base_url = '<?= base_url(); ?>';
+            const opcoes_campos = <?= json_encode(
+                $opcoes_por_campo,
+                JSON_UNESCAPED_UNICODE |
+                JSON_HEX_TAG |
+                JSON_HEX_AMP |
+                JSON_HEX_APOS |
+                JSON_HEX_QUOT
+            ); ?>;
             let secao_edicao = null;
             let secao_exclusao = null;
             let grupo_edicao = null;
             let grupo_exclusao = null;
+            let campo_edicao = null;
+            let campo_exclusao = null;
 
             function preparar_nova_secao() {
                 secao_edicao = null;
@@ -514,6 +799,114 @@
                 $('#alerta-grupo').empty().addClass('d-none');
 
                 alternar_limites_grupo();
+            }
+
+            function adicionar_opcao_campo(opcao = {}) {
+                const $linha = $('<div>', {
+                    class: 'input-group opcao-campo'
+                });
+                const $codigo = $('<input>', {
+                    name: 'opcao_codigo[]',
+                    type: 'hidden'
+                }).val(opcao.codigo || '');
+                const $nome = $('<input>', {
+                    class: 'form-control',
+                    maxlength: 100,
+                    name: 'opcao_nome[]',
+                    placeholder: 'Nome da opção',
+                    required: true,
+                    type: 'text'
+                }).val(opcao.nome || '');
+                const $subir = $('<button>', {
+                    'aria-label': 'Mover opção para cima',
+                    class: 'btn btn-light border subir-opcao-campo',
+                    type: 'button'
+                }).append(
+                    $('<i>', {
+                        'aria-hidden': 'true',
+                        class: 'fa-solid fa-arrow-up'
+                    })
+                );
+                const $descer = $('<button>', {
+                    'aria-label': 'Mover opção para baixo',
+                    class: 'btn btn-light border descer-opcao-campo',
+                    type: 'button'
+                }).append(
+                    $('<i>', {
+                        'aria-hidden': 'true',
+                        class: 'fa-solid fa-arrow-down'
+                    })
+                );
+                const $remover = $('<button>', {
+                    'aria-label': 'Remover opção',
+                    class: 'btn btn-light border remover-opcao-campo',
+                    type: 'button'
+                }).append(
+                    $('<i>', {
+                        'aria-hidden': 'true',
+                        class: 'fa-solid fa-trash-can text-danger'
+                    })
+                );
+
+                $linha.append(
+                    $codigo,
+                    $nome,
+                    $subir,
+                    $descer,
+                    $remover
+                );
+                $('#lista_opcoes_campo').append($linha);
+            }
+
+            function alternar_regras_campo() {
+                const tipo = $('#tipo_campo').val();
+                const texto = ['texto_curto', 'texto_longo'].includes(tipo);
+                const numero = tipo === 'numero';
+                const data = tipo === 'data';
+                const selecao = [
+                    'selecao_unica',
+                    'multipla_selecao'
+                ].includes(tipo);
+                const placeholder = texto || numero;
+
+                $('#regras_texto_campo').toggleClass('d-none', !texto);
+                $('#regras_numero_campo').toggleClass('d-none', !numero);
+                $('#regras_data_campo').toggleClass('d-none', !data);
+                $('#opcoes_campo').toggleClass('d-none', !selecao);
+                $('#tamanho_maximo_campo').prop('disabled', !texto);
+                $('#numero_minimo_campo, #numero_maximo_campo')
+                    .prop('disabled', !numero);
+                $('#data_minima_campo, #data_maxima_campo')
+                    .prop('disabled', !data);
+                $('#placeholder_campo').prop('disabled', !placeholder);
+                $('#lista_opcoes_campo input').prop('disabled', !selecao);
+
+                if (
+                    selecao &&
+                    $('#lista_opcoes_campo .opcao-campo').length === 0
+                ) {
+                    adicionar_opcao_campo();
+                    adicionar_opcao_campo();
+                }
+            }
+
+            function preparar_novo_campo($botao) {
+                campo_edicao = null;
+
+                $('#modalCampoLabel').text('Novo campo');
+                $('#formulario_campo')[0].reset();
+                $('#campo_grupo_codigo').val(
+                    $botao.data('grupo-codigo')
+                );
+                $('#campo_grupo_nome').text(
+                    'Grupo: ' + $botao.data('grupo-nome')
+                );
+                $('#lista_opcoes_campo').empty();
+                $('#ativo_campo').prop('checked', true);
+                $('#salvar_campo').html('Cadastrar campo');
+                $('#alerta-campo').empty().addClass('d-none');
+
+                alternar_regras_campo();
             }
 
             $('#nova_secao, #cadastrar_primeira_secao').on('click', function () {
@@ -570,6 +963,101 @@
                 $('#alerta-grupo').empty().addClass('d-none');
 
                 alternar_limites_grupo();
+            });
+
+            $('.novo-campo').on('click', function () {
+                preparar_novo_campo($(this));
+            });
+
+            $('#tipo_campo').on('change', function () {
+                alternar_regras_campo();
+            });
+
+            $('#adicionar_opcao_campo').on('click', function () {
+                adicionar_opcao_campo();
+            });
+
+            $('#lista_opcoes_campo').on(
+                'click',
+                '.remover-opcao-campo',
+                function () {
+                    $(this).closest('.opcao-campo').remove();
+                }
+            );
+
+            $('#lista_opcoes_campo').on(
+                'click',
+                '.subir-opcao-campo',
+                function () {
+                    const $linha = $(this).closest('.opcao-campo');
+                    $linha.prev('.opcao-campo').before($linha);
+                }
+            );
+
+            $('#lista_opcoes_campo').on(
+                'click',
+                '.descer-opcao-campo',
+                function () {
+                    const $linha = $(this).closest('.opcao-campo');
+                    $linha.next('.opcao-campo').after($linha);
+                }
+            );
+
+            $('.editar-campo').on('click', function () {
+                campo_edicao = $(this).data('codigo');
+
+                $('#modalCampoLabel').text('Editar campo');
+                $('#campo_grupo_codigo').val('');
+                $('#campo_grupo_nome').text(
+                    'Grupo: ' + $(this).data('grupo-nome')
+                );
+                $('#nome_campo').val($(this).data('nome'));
+                $('#tipo_campo').val($(this).data('tipo'));
+                $('#placeholder_campo').val(
+                    $(this).data('placeholder')
+                );
+                $('#texto_ajuda_campo').val(
+                    $(this).data('texto-ajuda')
+                );
+                $('#obrigatorio_campo').prop(
+                    'checked',
+                    Number($(this).data('obrigatorio')) === 1
+                );
+                $('#filtravel_campo').prop(
+                    'checked',
+                    Number($(this).data('filtravel')) === 1
+                );
+                $('#tamanho_maximo_campo').val(
+                    $(this).data('tamanho-maximo')
+                );
+                $('#numero_minimo_campo').val(
+                    $(this).data('numero-minimo')
+                );
+                $('#numero_maximo_campo').val(
+                    $(this).data('numero-maximo')
+                );
+                $('#data_minima_campo').val(
+                    $(this).data('data-minima')
+                );
+                $('#data_maxima_campo').val(
+                    $(this).data('data-maxima')
+                );
+                $('#ativo_campo').prop(
+                    'checked',
+                    Number($(this).data('ativo')) === 1
+                );
+                $('#lista_opcoes_campo').empty();
+
+                (opcoes_campos[campo_edicao] || []).forEach(
+                    function (opcao) {
+                        adicionar_opcao_campo(opcao);
+                    }
+                );
+
+                $('#salvar_campo').html('Salvar alterações');
+                $('#alerta-campo').empty().addClass('d-none');
+
+                alternar_regras_campo();
             });
 
             $('#formulario_configuracao').on('submit', function (e) {
@@ -815,6 +1303,115 @@
                     window.location.reload();
                 }).fail(function (xhr) {
                     mostrar_erro_ajax(xhr, 'alerta-exclusao-grupo');
+                }).always(function () {
+                    $botao
+                        .prop('disabled', false)
+                        .html('Excluir');
+                });
+            });
+
+            $('#formulario_campo').on('submit', function (e) {
+                e.preventDefault();
+
+                const $botao = $('#salvar_campo');
+                const url = campo_edicao
+                    ? base_url + 'formulario_campo/atualizar/' + campo_edicao
+                    : base_url + 'formulario_campo/cadastrar';
+
+                $('#alerta-campo').empty().addClass('d-none');
+
+                $botao
+                    .prop('disabled', true)
+                    .html(
+                        '<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Salvando...'
+                    );
+
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    dataType: 'json'
+                }).done(function () {
+                    bootstrap.Modal
+                        .getOrCreateInstance(
+                            document.getElementById('modalCampo')
+                        )
+                        .hide();
+
+                    window.location.reload();
+                }).fail(function (xhr) {
+                    mostrar_erro_ajax(xhr, 'alerta-campo');
+                }).always(function () {
+                    $botao
+                        .prop('disabled', false)
+                        .html(
+                            campo_edicao
+                                ? 'Salvar alterações'
+                                : 'Cadastrar campo'
+                        );
+                });
+            });
+
+            $('.mover-campo').on('click', function () {
+                const $botao = $(this);
+                const codigo = $botao.data('codigo');
+                const direcao = $botao.data('direcao');
+
+                $botao.prop('disabled', true);
+
+                $.ajax({
+                    url: base_url + 'formulario_campo/mover/' + codigo + '/' + direcao,
+                    method: 'POST',
+                    dataType: 'json'
+                }).done(function () {
+                    window.location.reload();
+                }).fail(function (xhr) {
+                    mostrar_erro_ajax(xhr, 'alerta-secoes');
+                    $botao.prop('disabled', false);
+                });
+            });
+
+            $('.excluir-campo').on('click', function () {
+                campo_exclusao = $(this).data('codigo');
+
+                $('#nome_campo_exclusao').text(
+                    $(this).data('nome')
+                );
+
+                $('#alerta-exclusao-campo')
+                    .empty()
+                    .addClass('d-none');
+            });
+
+            $('#formulario_exclusao_campo').on('submit', function (e) {
+                e.preventDefault();
+
+                if (!campo_exclusao) {
+                    return;
+                }
+
+                const $botao = $('#confirmar_exclusao_campo');
+
+                $botao
+                    .prop('disabled', true)
+                    .html(
+                        '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span>'
+                    );
+
+                $.ajax({
+                    url: base_url + 'formulario_campo/excluir/' + campo_exclusao,
+                    method: 'POST',
+                    dataType: 'json'
+                }).done(function () {
+                    bootstrap.Modal
+                        .getOrCreateInstance(
+                            document.getElementById('modalExcluirCampo')
+                        )
+                        .hide();
+
+                    window.location.reload();
+                }).fail(function (xhr) {
+                    mostrar_erro_ajax(xhr, 'alerta-exclusao-campo');
                 }).always(function () {
                     $botao
                         .prop('disabled', false)

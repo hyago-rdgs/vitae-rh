@@ -2,7 +2,12 @@
 $modulo_atual = $this->uri->segment(1);
 $formulario_ativo = in_array(
     $modulo_atual,
-    ['formulario', 'formulario_secao', 'formulario_grupo'],
+    [
+        'formulario',
+        'formulario_secao',
+        'formulario_grupo',
+        'formulario_campo'
+    ],
     TRUE
 );
 ?>

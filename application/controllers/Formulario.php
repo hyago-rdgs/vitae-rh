@@ -16,6 +16,8 @@ class Formulario extends CI_Controller
         $this->load->model('formulario_model');
         $this->load->model('formulario_secao_model');
         $this->load->model('formulario_grupo_model');
+        $this->load->model('formulario_campo_model');
+        $this->load->model('campo_opcao_model');
     }
 
     public function index()
@@ -103,11 +105,31 @@ class Formulario extends CI_Controller
             $grupos_por_secao[$grupo['secao_codigo']][] = $grupo;
         }
 
+        $campos = $this->formulario_campo_model
+            ->listar_por_formulario($formulario['codigo']);
+        $campos_por_grupo = [];
+
+        foreach ($campos as $campo) {
+            $campos_por_grupo[$campo['grupo_codigo']][] = $campo;
+        }
+
+        $opcoes = $this->campo_opcao_model
+            ->listar_por_formulario($formulario['codigo']);
+        $opcoes_por_campo = [];
+
+        foreach ($opcoes as $opcao) {
+            $opcoes_por_campo[$opcao['campo_codigo']][] = $opcao;
+        }
+
         $dados = [
             'formulario' => $formulario,
             'secoes' => $this->formulario_secao_model
                 ->listar_por_formulario($formulario['codigo']),
-            'grupos_por_secao' => $grupos_por_secao
+            'grupos_por_secao' => $grupos_por_secao,
+            'campos_por_grupo' => $campos_por_grupo,
+            'opcoes_por_campo' => $opcoes_por_campo,
+            'tipos_campos' => $this->formulario_campo_model
+                ->listar_tipos()
         ];
 
         $this->load->view(
