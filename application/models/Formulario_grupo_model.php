@@ -155,6 +155,36 @@ class Formulario_grupo_model extends CI_Model
         return $this->db->count_all_results('formulario_campos') > 0;
     }
 
+    public function secao_possui_campos($secao_codigo)
+    {
+        $this->db->from('formulario_campos c');
+        $this->db->join(
+            $this->tabela . ' g',
+            'g.codigo = c.grupo_codigo',
+            'INNER'
+        );
+        $this->db->where('g.secao_codigo', $secao_codigo);
+        $this->db->where('g.exclusao IS NULL', NULL, FALSE);
+        $this->db->where('c.exclusao IS NULL', NULL, FALSE);
+
+        return $this->db->count_all_results() > 0;
+    }
+
+    public function excluir_por_secao($secao_codigo)
+    {
+        $this->db->where('secao_codigo', $secao_codigo);
+        $this->db->where('exclusao IS NULL', NULL, FALSE);
+
+        return $this->db->update(
+            $this->tabela,
+            [
+                'ativo' => 0,
+                'atualizacao' => date('Y-m-d H:i:s'),
+                'exclusao' => date('Y-m-d H:i:s')
+            ]
+        );
+    }
+
     public function excluir($codigo)
     {
         $dados = [

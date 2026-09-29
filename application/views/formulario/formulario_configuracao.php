@@ -23,19 +23,26 @@
                 </p>
             </section>
 
-            <button class="btn btn-success" type="button" id="nova_secao"
-                data-bs-toggle="modal" data-bs-target="#modalSecao">
-                <i class="fa-solid fa-plus me-2" aria-hidden="true"></i>
-                Nova seção
-            </button>
+            <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-light border" href="<?= base_url('formulario/previsualizar'); ?>">
+                    <i class="fa-solid fa-eye me-2" aria-hidden="true"></i>
+                    Pré-visualizar
+                </a>
+
+                <button class="btn btn-success" type="button" id="nova_secao"
+                    data-bs-toggle="modal" data-bs-target="#modalSecao">
+                    <i class="fa-solid fa-plus me-2" aria-hidden="true"></i>
+                    Nova seção
+                </button>
+            </div>
         </header>
 
         <section class="alert alert-light border shadow-sm mb-4" aria-labelledby="estrutura-title">
             <h2 class="h6 fw-semibold mb-2" id="estrutura-title">Como o perfil é organizado</h2>
             <p class="small text-secondary mb-0">
-                <strong>Seções</strong> dividem o formulário em etapas,
-                <strong>grupos</strong> reúnem informações relacionadas e
+                <strong>Seções</strong> dividem o formulário em etapas e
                 <strong>campos</strong> são as perguntas respondidas pelo candidato.
+                Use grupos apenas quando precisar reunir ou repetir um conjunto de informações.
             </p>
         </section>
 
@@ -79,7 +86,7 @@
             <div class="card-header bg-white py-3">
                 <h2 class="h5 fw-semibold mb-1" id="secoes-title">Seções</h2>
                 <p class="small text-secondary mb-0">
-                    As seções organizam os grupos e campos exibidos ao candidato.
+                    As seções organizam os campos exibidos ao candidato.
                 </p>
             </div>
 
@@ -155,6 +162,66 @@
 
                             <?php $grupos_secao = $grupos_por_secao[$secao['codigo']] ?? []; ?>
 
+                            <?php
+                            $grupo_principal = count($grupos_secao) === 1 &&
+                                (int) $grupos_secao[0]['repetivel'] === 0
+                                    ? $grupos_secao[0]
+                                    : NULL;
+                            ?>
+
+                            <?php if ($grupo_principal): ?>
+                                <?php $campos_principais = $campos_por_grupo[$grupo_principal['codigo']] ?? []; ?>
+
+                                <div class="border rounded mt-4">
+                                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 p-3 border-bottom">
+                                        <div>
+                                            <h4 class="h6 fw-semibold mb-1">Campos da seção</h4>
+                                            <p class="small text-secondary mb-0">
+                                                Campos exibidos diretamente nesta etapa do formulário.
+                                            </p>
+                                        </div>
+
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <button class="btn btn-sm btn-success novo-campo" type="button"
+                                                data-grupo-codigo="<?= $grupo_principal['codigo']; ?>"
+                                                data-grupo-nome="<?= html_escape($grupo_principal['nome']); ?>"
+                                                data-bs-toggle="modal" data-bs-target="#modalCampo">
+                                                <i class="fa-solid fa-plus me-1" aria-hidden="true"></i>
+                                                Novo campo
+                                            </button>
+
+                                            <button class="btn btn-sm btn-light border editar-grupo" type="button"
+                                                data-codigo="<?= $grupo_principal['codigo']; ?>"
+                                                data-secao-titulo="<?= html_escape($secao['titulo']); ?>"
+                                                data-nome="<?= html_escape($grupo_principal['nome']); ?>"
+                                                data-descricao="<?= html_escape($grupo_principal['descricao'] ?? ''); ?>"
+                                                data-repetivel="0"
+                                                data-quantidade-minima="1"
+                                                data-quantidade-maxima="1"
+                                                data-ativo="<?= (int) $grupo_principal['ativo']; ?>"
+                                                data-bs-toggle="modal" data-bs-target="#modalGrupo">
+                                                Configurar repetição
+                                            </button>
+
+                                            <button class="btn btn-sm btn-light border novo-grupo" type="button"
+                                                data-secao-codigo="<?= $secao['codigo']; ?>"
+                                                data-secao-titulo="<?= html_escape($secao['titulo']); ?>"
+                                                data-bs-toggle="modal" data-bs-target="#modalGrupo">
+                                                Adicionar grupo
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <?php $this->load->view(
+                                        'formulario/campos_lista',
+                                        [
+                                            'campos' => $campos_principais,
+                                            'grupo' => $grupo_principal,
+                                            'tipos_campos' => $tipos_campos
+                                        ]
+                                    ); ?>
+                                </div>
+                            <?php else: ?>
                             <div class="border rounded mt-4">
                                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 p-3 border-bottom">
                                     <div>
@@ -270,97 +337,14 @@
                                                         <h6 class="small fw-semibold mb-0">Campos do grupo</h6>
                                                     </div>
 
-                                                    <?php if (!empty($campos_grupo)): ?>
-                                                        <div class="list-group list-group-flush">
-                                                            <?php foreach ($campos_grupo as $indice_campo => $campo): ?>
-                                                                <div class="list-group-item px-3 py-2">
-                                                                    <div class="d-flex flex-column flex-lg-row justify-content-between gap-2">
-                                                                        <div class="d-flex align-items-start gap-2">
-                                                                            <span class="badge text-bg-light border mt-1">
-                                                                                <?= (int) $campo['ordem']; ?>
-                                                                            </span>
-
-                                                                            <div>
-                                                                                <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
-                                                                                    <span class="small fw-semibold">
-                                                                                        <?= html_escape($campo['nome']); ?>
-                                                                                    </span>
-                                                                                    <span class="badge text-bg-light border">
-                                                                                        <?= html_escape($tipos_campos[$campo['tipo']] ?? $campo['tipo']); ?>
-                                                                                    </span>
-
-                                                                                    <?php if ((int) $campo['obrigatorio'] === 1): ?>
-                                                                                        <span class="badge text-bg-warning">Obrigatório</span>
-                                                                                    <?php endif; ?>
-
-                                                                                    <?php if ((int) $campo['filtravel'] === 1): ?>
-                                                                                        <span class="badge text-bg-info">Filtrável</span>
-                                                                                    <?php endif; ?>
-
-                                                                                    <?php if ((int) $campo['ativo'] !== 1): ?>
-                                                                                        <span class="badge text-bg-secondary">Inativo</span>
-                                                                                    <?php endif; ?>
-                                                                                </div>
-
-                                                                                <?php if (!empty($campo['texto_ajuda'])): ?>
-                                                                                    <span class="small text-secondary">
-                                                                                        <?= html_escape($campo['texto_ajuda']); ?>
-                                                                                    </span>
-                                                                                <?php endif; ?>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div class="d-flex flex-wrap justify-content-lg-end align-items-start gap-2">
-                                                                            <button class="btn btn-sm btn-light border mover-campo" type="button"
-                                                                                data-codigo="<?= $campo['codigo']; ?>" data-direcao="subir"
-                                                                                <?= $indice_campo === 0 ? 'disabled' : ''; ?>
-                                                                                aria-label="Mover <?= html_escape($campo['nome']); ?> para cima">
-                                                                                <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
-                                                                            </button>
-
-                                                                            <button class="btn btn-sm btn-light border mover-campo" type="button"
-                                                                                data-codigo="<?= $campo['codigo']; ?>" data-direcao="descer"
-                                                                                <?= $indice_campo === count($campos_grupo) - 1 ? 'disabled' : ''; ?>
-                                                                                aria-label="Mover <?= html_escape($campo['nome']); ?> para baixo">
-                                                                                <i class="fa-solid fa-arrow-down" aria-hidden="true"></i>
-                                                                            </button>
-
-                                                                            <button class="btn btn-sm btn-light border editar-campo" type="button"
-                                                                                data-codigo="<?= $campo['codigo']; ?>"
-                                                                                data-grupo-nome="<?= html_escape($grupo['nome']); ?>"
-                                                                                data-nome="<?= html_escape($campo['nome']); ?>"
-                                                                                data-tipo="<?= html_escape($campo['tipo']); ?>"
-                                                                                data-placeholder="<?= html_escape($campo['placeholder'] ?? ''); ?>"
-                                                                                data-texto-ajuda="<?= html_escape($campo['texto_ajuda'] ?? ''); ?>"
-                                                                                data-obrigatorio="<?= (int) $campo['obrigatorio']; ?>"
-                                                                                data-filtravel="<?= (int) $campo['filtravel']; ?>"
-                                                                                data-tamanho-maximo="<?= html_escape($campo['tamanho_maximo'] ?? ''); ?>"
-                                                                                data-numero-minimo="<?= html_escape($campo['numero_minimo'] ?? ''); ?>"
-                                                                                data-numero-maximo="<?= html_escape($campo['numero_maximo'] ?? ''); ?>"
-                                                                                data-data-minima="<?= html_escape($campo['data_minima'] ?? ''); ?>"
-                                                                                data-data-maxima="<?= html_escape($campo['data_maxima'] ?? ''); ?>"
-                                                                                data-ativo="<?= (int) $campo['ativo']; ?>"
-                                                                                data-bs-toggle="modal" data-bs-target="#modalCampo">
-                                                                                <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
-                                                                            </button>
-
-                                                                            <button class="btn btn-sm btn-light border text-danger excluir-campo" type="button"
-                                                                                data-codigo="<?= $campo['codigo']; ?>"
-                                                                                data-nome="<?= html_escape($campo['nome']); ?>"
-                                                                                data-bs-toggle="modal" data-bs-target="#modalExcluirCampo"
-                                                                                aria-label="Excluir <?= html_escape($campo['nome']); ?>">
-                                                                                <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
-                                                                            </button>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            <?php endforeach; ?>
-                                                        </div>
-                                                    <?php else: ?>
-                                                        <div class="px-3 py-2 text-center text-secondary small">
-                                                            Nenhum campo cadastrado neste grupo.
-                                                        </div>
-                                                    <?php endif; ?>
+                                                    <?php $this->load->view(
+                                                        'formulario/campos_lista',
+                                                        [
+                                                            'campos' => $campos_grupo,
+                                                            'grupo' => $grupo,
+                                                            'tipos_campos' => $tipos_campos
+                                                        ]
+                                                    ); ?>
                                                 </div>
                                             </div>
                                         <?php endforeach; ?>
@@ -371,6 +355,7 @@
                                     </div>
                                 <?php endif; ?>
                             </div>
+                            <?php endif; ?>
                         </article>
                     <?php endforeach; ?>
                 </div>

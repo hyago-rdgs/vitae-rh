@@ -15,6 +15,7 @@ class Formulario_secao extends CI_Controller
         $this->load->database();
         $this->load->model('formulario_model');
         $this->load->model('formulario_secao_model');
+        $this->load->model('formulario_grupo_model');
     }
 
     public function cadastrar()
@@ -63,20 +64,50 @@ class Formulario_secao extends CI_Controller
             )
             : FALSE;
 
-        $auditoria_salva = $secao
+        $grupo_codigo = $secao
+            ? $this->formulario_grupo_model->cadastrar([
+                'secao_codigo' => $secao['codigo'],
+                'nome' => $secao['titulo'],
+                'descricao' => NULL,
+                'repetivel' => 0,
+                'quantidade_minima' => 1,
+                'quantidade_maxima' => 1,
+                'ativo' => $secao['ativo']
+            ])
+            : FALSE;
+
+        $grupo = $grupo_codigo
+            ? $this->formulario_grupo_model->buscar_por_codigo(
+                $grupo_codigo
+            )
+            : FALSE;
+
+        $dados_auditoria = (
+            $secao &&
+            $grupo
+        )
+            ? [
+                'secao' => $secao,
+                'grupo_principal' => $grupo
+            ]
+            : FALSE;
+
+        $auditoria_salva = $dados_auditoria
             ? $this->auditoria->registrar(
                 'formularios',
                 'SECAO_CADASTRADA',
                 'formulario_secoes',
                 $codigo,
                 NULL,
-                $secao
+                $dados_auditoria
             )
             : FALSE;
 
         if (
             !$codigo ||
             !$secao ||
+            !$grupo_codigo ||
+            !$grupo ||
             !$auditoria_salva ||
             $this->db->trans_status() === FALSE
         ) {
@@ -270,15 +301,15 @@ class Formulario_secao extends CI_Controller
 
         $secao = $this->buscar_secao($codigo);
 
-        if ($this->formulario_secao_model->possui_grupos(
+        if ($this->formulario_grupo_model->secao_possui_campos(
             $secao['codigo']
         )) {
             resposta_json(
                 FALSE,
-                'Não é possível excluir uma seção que possui grupos.',
+                'Não é possível excluir uma seção que possui campos.',
                 [
                     'erros' => [
-                        'Exclua os grupos vinculados antes de continuar.'
+                        'Exclua os campos vinculados antes de continuar.'
                     ]
                 ],
                 422
@@ -287,9 +318,14 @@ class Formulario_secao extends CI_Controller
 
         $this->db->trans_begin();
 
-        $excluido = $this->formulario_secao_model->excluir(
-            $secao['codigo']
-        );
+        $grupos_excluidos = $this->formulario_grupo_model
+            ->excluir_por_secao($secao['codigo']);
+
+        $excluido = $grupos_excluidos
+            ? $this->formulario_secao_model->excluir(
+                $secao['codigo']
+            )
+            : FALSE;
 
         $auditoria_salva = $excluido
             ? $this->auditoria->registrar(
@@ -303,6 +339,7 @@ class Formulario_secao extends CI_Controller
             : FALSE;
 
         if (
+            !$grupos_excluidos ||
             !$excluido ||
             !$auditoria_salva ||
             $this->db->trans_status() === FALSE

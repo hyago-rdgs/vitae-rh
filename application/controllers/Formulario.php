@@ -97,6 +97,40 @@ class Formulario extends CI_Controller
             );
         }
 
+        $dados = $this->preparar_dados_estrutura($formulario);
+
+        $this->load->view(
+            'formulario/formulario_configuracao',
+            $dados
+        );
+    }
+
+    public function previsualizar()
+    {
+        if ($this->input->method() !== 'get') {
+            show_404();
+        }
+
+        $formulario = $this->formulario_model->buscar();
+
+        if (!$formulario) {
+            show_error(
+                'A estrutura do formulário não foi encontrada.',
+                500,
+                'Pré-visualização indisponível'
+            );
+        }
+
+        $dados = $this->preparar_dados_estrutura($formulario);
+
+        $this->load->view(
+            'formulario/formulario_previsualizacao',
+            $dados
+        );
+    }
+
+    private function preparar_dados_estrutura($formulario)
+    {
         $grupos = $this->formulario_grupo_model
             ->listar_por_formulario($formulario['codigo']);
         $grupos_por_secao = [];
@@ -121,7 +155,7 @@ class Formulario extends CI_Controller
             $opcoes_por_campo[$opcao['campo_codigo']][] = $opcao;
         }
 
-        $dados = [
+        return [
             'formulario' => $formulario,
             'secoes' => $this->formulario_secao_model
                 ->listar_por_formulario($formulario['codigo']),
@@ -131,11 +165,6 @@ class Formulario extends CI_Controller
             'tipos_campos' => $this->formulario_campo_model
                 ->listar_tipos()
         ];
-
-        $this->load->view(
-            'formulario/formulario_configuracao',
-            $dados
-        );
     }
 
     private function validar($reg)
