@@ -36,4 +36,13 @@ class Formulario_model extends CI_Model
 
         return $this->db->update($this->tabela, $reg);
     }
+
+    public function bloquear_para_publicacao($codigo)
+    {
+        $sql = 'SELECT codigo FROM ' . $this->tabela . '
+            WHERE codigo = ? AND exclusao IS NULL
+            FOR UPDATE';
+
+        return $this->db->query($sql, [(int) $codigo])->row_array();
+    }
 }

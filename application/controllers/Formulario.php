@@ -18,6 +18,7 @@ class Formulario extends CI_Controller
         $this->load->model('formulario_grupo_model');
         $this->load->model('formulario_campo_model');
         $this->load->model('campo_opcao_model');
+        $this->load->model('formulario_publicacao_model');
     }
 
     public function index()
@@ -163,7 +164,13 @@ class Formulario extends CI_Controller
             'campos_por_grupo' => $campos_por_grupo,
             'opcoes_por_campo' => $opcoes_por_campo,
             'tipos_campos' => $this->formulario_campo_model
-                ->listar_tipos()
+                ->listar_tipos(),
+            'publicacao_atual' => $this->formulario_publicacao_model
+                ->buscar_atual($formulario['codigo']),
+            'publicacoes' => $this->formulario_publicacao_model
+                ->listar_por_formulario($formulario['codigo']),
+            'pode_publicar' => $this->controle_acesso
+                ->tem_permissao('formularios.publicar')
         ];
     }
 

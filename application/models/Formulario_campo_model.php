@@ -210,6 +210,30 @@ class Formulario_campo_model extends CI_Model
         return $this->db->affected_rows() > 0;
     }
 
+    public function marcar_publicados($formulario_codigo)
+    {
+        $sql = 'UPDATE ' . $this->tabela . ' c
+            INNER JOIN formulario_grupos g
+                ON g.codigo = c.grupo_codigo
+            INNER JOIN formulario_secoes s
+                ON s.codigo = g.secao_codigo
+            SET c.publicado = 1,
+                c.atualizacao = ?
+            WHERE s.formulario_codigo = ?
+                AND s.ativo = 1
+                AND g.ativo = 1
+                AND c.ativo = 1
+                AND c.publicado = 0
+                AND s.exclusao IS NULL
+                AND g.exclusao IS NULL
+                AND c.exclusao IS NULL';
+
+        return $this->db->query(
+            $sql,
+            [date('Y-m-d H:i:s'), (int) $formulario_codigo]
+        );
+    }
+
     private function proxima_ordem($grupo_codigo)
     {
         $this->db->select_max('ordem');

@@ -6,7 +6,8 @@ $formulario_ativo = in_array(
         'formulario',
         'formulario_secao',
         'formulario_grupo',
-        'formulario_campo'
+        'formulario_campo',
+        'formulario_publicacao'
     ],
     TRUE
 );

@@ -29,6 +29,14 @@
                     Pré-visualizar
                 </a>
 
+                <?php if ($pode_publicar): ?>
+                    <button class="btn btn-primary" type="button"
+                        data-bs-toggle="modal" data-bs-target="#modalPublicacao">
+                        <i class="fa-solid fa-cloud-arrow-up me-2" aria-hidden="true"></i>
+                        Publicar
+                    </button>
+                <?php endif; ?>
+
                 <button class="btn btn-success" type="button" id="nova_secao"
                     data-bs-toggle="modal" data-bs-target="#modalSecao">
                     <i class="fa-solid fa-plus me-2" aria-hidden="true"></i>
@@ -44,6 +52,46 @@
                 <strong>campos</strong> são as perguntas respondidas pelo candidato.
                 Use grupos apenas quando precisar reunir ou repetir um conjunto de informações.
             </p>
+        </section>
+
+        <section class="card border shadow-sm mb-4" aria-labelledby="publicacao-title">
+            <div class="card-body p-4">
+                <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
+                    <div>
+                        <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                            <h2 class="h5 fw-semibold mb-0" id="publicacao-title">Publicação</h2>
+                            <?php if ($publicacao_atual): ?>
+                                <span class="badge text-bg-success">
+                                    Versão <?= (int) $publicacao_atual['versao']; ?> vigente
+                                </span>
+                            <?php else: ?>
+                                <span class="badge text-bg-warning">Não publicado</span>
+                            <?php endif; ?>
+                        </div>
+
+                        <?php if ($publicacao_atual): ?>
+                            <p class="small text-secondary mb-0">
+                                Publicada em
+                                <?= date('d/m/Y', strtotime($publicacao_atual['cadastro'])); ?>
+                                às
+                                <?= date('H:i', strtotime($publicacao_atual['cadastro'])); ?>
+                                <?php if (!empty($publicacao_atual['usuario_nome'])): ?>
+                                    por <?= html_escape($publicacao_atual['usuario_nome']); ?>
+                                <?php endif; ?>
+                                .
+                            </p>
+                        <?php else: ?>
+                            <p class="small text-secondary mb-0">
+                                O formulário ainda está somente como rascunho.
+                            </p>
+                        <?php endif; ?>
+                    </div>
+
+                    <p class="small text-secondary mb-0 align-self-md-center">
+                        Alterações no rascunho não afetam a versão vigente até uma nova publicação.
+                    </p>
+                </div>
+            </div>
         </section>
 
         <form id="formulario_configuracao" method="post" novalidate>
@@ -373,7 +421,105 @@
                 </div>
             <?php endif; ?>
         </section>
+
+        <section class="card border shadow-sm mt-4" aria-labelledby="historico-publicacoes-title">
+            <div class="card-header bg-white py-3">
+                <h2 class="h5 fw-semibold mb-1" id="historico-publicacoes-title">
+                    Histórico de publicações
+                </h2>
+                <p class="small text-secondary mb-0">
+                    Cada publicação preserva uma cópia imutável da estrutura do formulário.
+                </p>
+            </div>
+
+            <?php if (!empty($publicacoes)): ?>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th scope="col">Versão</th>
+                                <th scope="col">Data</th>
+                                <th scope="col">Responsável</th>
+                                <th scope="col">Observação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($publicacoes as $indice_publicacao => $publicacao): ?>
+                                <tr>
+                                    <td>
+                                        <span class="fw-semibold">v<?= (int) $publicacao['versao']; ?></span>
+                                        <?php if ($indice_publicacao === 0): ?>
+                                            <span class="badge text-bg-success ms-1">Vigente</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <?= date('d/m/Y H:i', strtotime($publicacao['cadastro'])); ?>
+                                    </td>
+                                    <td>
+                                        <?= html_escape($publicacao['usuario_nome'] ?? 'Usuário removido'); ?>
+                                    </td>
+                                    <td>
+                                        <?= html_escape($publicacao['observacao'] ?? '—'); ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php else: ?>
+                <div class="card-body text-center text-secondary py-4">
+                    Nenhuma versão publicada.
+                </div>
+            <?php endif; ?>
+        </section>
     </main>
+
+    <?php if ($pode_publicar): ?>
+        <div class="modal fade" id="modalPublicacao" tabindex="-1"
+            aria-labelledby="modalPublicacaoLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header">
+                        <h2 class="modal-title fs-5" id="modalPublicacaoLabel">
+                            Publicar formulário
+                        </h2>
+                        <button class="btn-close" type="button" data-bs-dismiss="modal"
+                            aria-label="Fechar"></button>
+                    </div>
+
+                    <form id="formulario_publicacao" method="post">
+                        <div class="modal-body">
+                            <div id="alerta-publicacao" class="alert alert-danger d-none" role="alert"></div>
+
+                            <p>
+                                Será criada a versão
+                                <strong><?= (int) ($publicacao_atual['versao'] ?? 0) + 1; ?></strong>
+                                com a estrutura atual do rascunho.
+                            </p>
+
+                            <div>
+                                <label class="form-label" for="observacao_publicacao">
+                                    Observação
+                                </label>
+                                <textarea class="form-control" id="observacao_publicacao"
+                                    name="observacao" maxlength="255" rows="3"
+                                    placeholder="Descreva as principais alterações desta versão"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button class="btn btn-light border" type="button" data-bs-dismiss="modal">
+                                Cancelar
+                            </button>
+                            <button class="btn btn-primary" type="submit" id="confirmar_publicacao">
+                                Publicar versão
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
 
     <div class="modal fade" id="modalSecao" tabindex="-1" aria-labelledby="modalSecaoLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -1074,6 +1220,41 @@
                     $botao
                         .prop('disabled', false)
                         .html('Salvar configurações');
+                });
+            });
+
+            $('#formulario_publicacao').on('submit', function (e) {
+                e.preventDefault();
+
+                const $botao = $('#confirmar_publicacao');
+
+                $('#alerta-publicacao').empty().addClass('d-none');
+
+                $botao
+                    .prop('disabled', true)
+                    .html(
+                        '<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Publicando...'
+                    );
+
+                $.ajax({
+                    url: base_url + 'formulario_publicacao/publicar',
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    dataType: 'json'
+                }).done(function () {
+                    bootstrap.Modal
+                        .getOrCreateInstance(
+                            document.getElementById('modalPublicacao')
+                        )
+                        .hide();
+
+                    window.location.reload();
+                }).fail(function (xhr) {
+                    mostrar_erro_ajax(xhr, 'alerta-publicacao');
+                }).always(function () {
+                    $botao
+                        .prop('disabled', false)
+                        .html('Publicar versão');
                 });
             });
 
