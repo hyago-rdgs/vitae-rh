@@ -1,4 +1,11 @@
-<?php $modulo_atual = $this->uri->segment(1); ?>
+<?php
+$modulo_atual = $this->uri->segment(1);
+$formulario_ativo = in_array(
+    $modulo_atual,
+    ['formulario', 'formulario_secao', 'formulario_grupo'],
+    TRUE
+);
+?>
 <header class="bg-white border-bottom sticky-top">
     <nav class="navbar navbar-expand-lg" aria-label="Navegação principal">
         <section class="container-fluid px-3 px-lg-4">
@@ -31,6 +38,16 @@
                             <?= $modulo_atual == 'perfil' ? 'aria-current="page"' : ''; ?>
                             href="<?= base_url('perfil'); ?>">
                             Perfis
+                        </a>
+                    </li>
+                    <?php endif; ?>
+
+                    <?php if ($this->controle_acesso->tem_permissao('formularios.gerenciar')): ?>
+                    <li class="nav-item">
+                        <a class="nav-link <?= $formulario_ativo ? 'active fw-semibold' : ''; ?>"
+                            <?= $formulario_ativo ? 'aria-current="page"' : ''; ?>
+                            href="<?= base_url('formulario'); ?>">
+                            Configuração do perfil
                         </a>
                     </li>
                     <?php endif; ?>

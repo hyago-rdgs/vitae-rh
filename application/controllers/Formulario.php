@@ -15,6 +15,7 @@ class Formulario extends CI_Controller
         $this->load->database();
         $this->load->model('formulario_model');
         $this->load->model('formulario_secao_model');
+        $this->load->model('formulario_grupo_model');
     }
 
     public function index()
@@ -94,10 +95,19 @@ class Formulario extends CI_Controller
             );
         }
 
+        $grupos = $this->formulario_grupo_model
+            ->listar_por_formulario($formulario['codigo']);
+        $grupos_por_secao = [];
+
+        foreach ($grupos as $grupo) {
+            $grupos_por_secao[$grupo['secao_codigo']][] = $grupo;
+        }
+
         $dados = [
             'formulario' => $formulario,
             'secoes' => $this->formulario_secao_model
-                ->listar_por_formulario($formulario['codigo'])
+                ->listar_por_formulario($formulario['codigo']),
+            'grupos_por_secao' => $grupos_por_secao
         ];
 
         $this->load->view(

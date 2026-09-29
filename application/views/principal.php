@@ -24,28 +24,26 @@
             </header>
 
             <div class="row g-3">
-                <?php if ($this->controle_acesso->tem_permissao('modulo.acao')): ?>
-                    <!-- EXEMPLO DE CARD: -->
-
-                    <!-- <div class="col-12 col-md-6 col-xl-4">
+                <?php if ($this->controle_acesso->tem_permissao('formularios.gerenciar')): ?>
+                    <div class="col-12 col-md-6 col-xl-4">
                         <a class="card h-100 border shadow-sm text-decoration-none text-body"
-                            href="<?= base_url(''); ?>">
+                            href="<?= base_url('formulario'); ?>">
                             <div class="card-body p-4">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
                                     <span
-                                        class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded p-3"
+                                        class="d-inline-flex align-items-center justify-content-center bg-success-subtle text-success rounded p-3"
                                         aria-hidden="true">
-                                        <i class="fa-solid fa-chart-column fa-lg"></i>
+                                        <i class="fa-solid fa-list-check fa-lg"></i>
                                     </span>
                                     <i class="fa-solid fa-arrow-right text-body-tertiary" aria-hidden="true"></i>
                                 </div>
-                                <h3 class="h6 fw-semibold">Dashboard</h3>
+                                <h3 class="h6 fw-semibold">Configuração do perfil</h3>
                                 <p class="small text-body-secondary mb-0">
-                                    Acompanhe indicadores do acervo, digitalização e movimentações.
+                                    Organize as seções, grupos e campos solicitados aos candidatos.
                                 </p>
                             </div>
                         </a>
-                    </div> -->
+                    </div>
                 <?php endif; ?>
             </div>
         </section>
