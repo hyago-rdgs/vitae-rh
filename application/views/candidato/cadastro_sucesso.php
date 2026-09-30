@@ -20,8 +20,9 @@
                 </span>
                 <h1 class="h3 fw-semibold">Perfil cadastrado</h1>
                 <p class="text-body-secondary mb-4">
-                    Seus dados foram registrados. O acesso ao portal do candidato será disponibilizado em uma próxima etapa.
+                    Seus dados foram registrados. Acesse seu perfil com o e-mail e a senha cadastrados.
                 </p>
+                <a class="btn btn-success" href="<?= base_url('candidato/login'); ?>">Entrar no portal</a>
             </div>
         </section>
     </main>

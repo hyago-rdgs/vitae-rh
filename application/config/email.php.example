@@ -1,0 +1,16 @@
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+// Configuração local do transporte para os links de recuperação do candidato.
+// Copie para email.php e ajuste conforme o servidor de e-mail da empresa.
+$config['protocol'] = 'smtp';
+$config['smtp_host'] = 'smtp.exemplo.com';
+$config['smtp_port'] = 587;
+$config['smtp_crypto'] = 'tls';
+$config['smtp_user'] = 'usuario';
+$config['smtp_pass'] = 'senha';
+$config['mailtype'] = 'text';
+$config['charset'] = 'utf-8';
+$config['newline'] = "\r\n";
+$config['crlf'] = "\r\n";
+// Defina VITAE_EMAIL_REMETENTE no ambiente para o endereço do remetente.

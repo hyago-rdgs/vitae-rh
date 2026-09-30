@@ -31,6 +31,7 @@ class Candidato_formulario_model extends CI_Model
             'INNER'
         );
         $this->db->where('cf.candidato_codigo', $candidato_codigo);
+        $this->db->order_by('cf.codigo', 'DESC');
         $this->db->limit(1);
 
         return $this->db->get()->row_array();

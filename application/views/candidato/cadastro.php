@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Cadastro de perfil de candidato">
-    <title>Cadastro de candidato | Vitae RH</title>
+    <title><?= !empty($edicao) ? 'Editar perfil' : 'Cadastro de candidato'; ?> | Vitae RH</title>
 
     <?php $this->load->view('css'); ?>
 </head>
@@ -21,6 +21,9 @@
                     </span>
                     <span>Vitae RH</span>
                 </a>
+                <a class="btn btn-outline-success btn-sm" href="<?= base_url(!empty($edicao) ? 'candidato/portal' : 'candidato/login'); ?>">
+                    <?= !empty($edicao) ? 'Meu perfil' : 'Já tenho cadastro'; ?>
+                </a>
             </div>
         </nav>
     </header>
@@ -30,9 +33,11 @@
             <p class="small text-success fw-semibold text-uppercase mb-1">
                 Perfil do candidato · Versão <?= (int) $publicacao['versao']; ?>
             </p>
-            <h1 class="h2 mb-2">Crie seu perfil</h1>
+            <h1 class="h2 mb-2"><?= !empty($edicao) ? 'Edite seu perfil' : 'Crie seu perfil'; ?></h1>
             <p class="text-body-secondary mb-0">
-                Preencha seus dados e as informações solicitadas para participar de oportunidades.
+                <?= !empty($edicao)
+                    ? 'Revise seus dados e as informações solicitadas na publicação vigente.'
+                    : 'Preencha seus dados e as informações solicitadas para participar de oportunidades.'; ?>
             </p>
             <?php if (!empty($estrutura['formulario']['descricao'])): ?>
                 <p class="text-body-secondary mt-2 mb-0">
@@ -52,9 +57,12 @@
             </div>
         <?php endif; ?>
 
-        <form action="<?= base_url('candidato/cadastro'); ?>" method="post"
+        <form action="<?= base_url(!empty($edicao) ? 'candidato/portal/editar' : 'candidato/cadastro'); ?>" method="post"
             enctype="multipart/form-data" id="form-cadastro-candidato">
-            <input type="hidden" name="token_cadastro" value="<?= html_escape($token_cadastro); ?>">
+            <input type="hidden" name="<?= !empty($edicao) ? 'token' : 'token_cadastro'; ?>" value="<?= html_escape($token_cadastro); ?>">
+            <?php if (!empty($edicao)): ?>
+                <input type="hidden" name="candidato_formulario_codigo" value="<?= (int) $formulario_atual_codigo; ?>">
+            <?php endif; ?>
             <input type="hidden" name="formulario_publicacao_codigo"
                 value="<?= (int) $publicacao['codigo']; ?>">
             <section class="card border shadow-sm mb-4" aria-labelledby="dados-pessoais-title">
@@ -90,20 +98,21 @@
                         </div>
                         <div class="col-12 col-lg-6">
                             <label class="form-label fw-semibold" for="foto_perfil">
-                                Foto de perfil <span class="text-danger">*</span>
+                                Foto de perfil <?php if (empty($edicao)): ?><span class="text-danger">*</span><?php endif; ?>
                             </label>
                             <input class="form-control" id="foto_perfil" name="foto_perfil"
-                                type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" required>
-                            <div class="form-text">JPG ou PNG; tamanho máximo de 5 MB.</div>
+                                type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" <?= empty($edicao) ? 'required' : ''; ?>>
+                            <div class="form-text">JPG ou PNG; tamanho máximo de 5 MB. <?= !empty($edicao) ? 'Deixe em branco para manter a foto atual.' : ''; ?></div>
                         </div>
                         <div class="col-12 col-lg-6">
                             <label class="form-label fw-semibold" for="curriculo">
-                                Currículo <span class="text-danger">*</span>
+                                Currículo <?php if (empty($edicao)): ?><span class="text-danger">*</span><?php endif; ?>
                             </label>
                             <input class="form-control" id="curriculo" name="curriculo"
-                                type="file" accept=".pdf,.doc,.docx,application/pdf" required>
-                            <div class="form-text">PDF, DOC ou DOCX; tamanho máximo de 10 MB.</div>
+                                type="file" accept=".pdf,.doc,.docx,application/pdf" <?= empty($edicao) ? 'required' : ''; ?>>
+                            <div class="form-text">PDF, DOC ou DOCX; tamanho máximo de 10 MB. <?= !empty($edicao) ? 'Deixe em branco para manter o currículo atual.' : ''; ?></div>
                         </div>
+                        <?php if (empty($edicao)): ?>
                         <div class="col-12 col-lg-6">
                             <label class="form-label fw-semibold" for="senha">
                                 Senha <span class="text-danger">*</span>
@@ -130,6 +139,7 @@
                                 </label>
                             </div>
                         </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </section>
@@ -279,9 +289,12 @@
             <?php endforeach; ?>
 
             <div class="d-flex flex-column flex-sm-row justify-content-end gap-2">
+                <?php if (!empty($edicao)): ?>
+                    <a class="btn btn-outline-secondary btn-lg" href="<?= base_url('candidato/portal'); ?>">Cancelar</a>
+                <?php endif; ?>
                 <button class="btn btn-success btn-lg" type="submit" id="btn-cadastrar-candidato">
-                    <i class="fa-solid fa-user-plus me-2" aria-hidden="true"></i>
-                    Criar meu perfil
+                    <i class="fa-solid fa-<?= !empty($edicao) ? 'floppy-disk' : 'user-plus'; ?> me-2" aria-hidden="true"></i>
+                    <?= !empty($edicao) ? 'Salvar perfil' : 'Criar meu perfil'; ?>
                 </button>
             </div>
         </form>

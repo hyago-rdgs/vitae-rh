@@ -121,7 +121,7 @@ class Candidato extends CI_Controller
         $this->load->view('candidato/cadastro_sucesso');
     }
 
-    private function buscar_publicacao_vigente()
+    protected function buscar_publicacao_vigente()
     {
         $formulario = $this->formulario_model->buscar();
 
@@ -155,7 +155,7 @@ class Candidato extends CI_Controller
         ];
     }
 
-    private function estrutura_valida($estrutura)
+    protected function estrutura_valida($estrutura)
     {
         if (
             !is_array($estrutura) ||
@@ -374,7 +374,7 @@ class Candidato extends CI_Controller
         ];
     }
 
-    private function validar_respostas($estrutura, $post, &$erros)
+    protected function validar_respostas($estrutura, $post, &$erros)
     {
         $recebidas = isset($post['respostas']) && is_array($post['respostas'])
             ? $post['respostas']
@@ -646,7 +646,7 @@ class Candidato extends CI_Controller
         ];
     }
 
-    private function receber_arquivos()
+    protected function receber_arquivos($obrigatorios = TRUE)
     {
         $diretorio = FCPATH . 'uploads/candidatos/';
 
@@ -692,7 +692,9 @@ class Candidato extends CI_Controller
                 is_array($_FILES[$campo]['error']) ||
                 (int) $_FILES[$campo]['error'] === UPLOAD_ERR_NO_FILE
             ) {
-                $erros[] = 'O arquivo ' . $configuracao['rotulo'] . ' é obrigatório.';
+                if ($obrigatorios) {
+                    $erros[] = 'O arquivo ' . $configuracao['rotulo'] . ' é obrigatório.';
+                }
                 continue;
             }
 
@@ -831,7 +833,7 @@ class Candidato extends CI_Controller
         return TRUE;
     }
 
-    private function remover_arquivos($arquivos)
+    protected function remover_arquivos($arquivos)
     {
         $diretorio = FCPATH . 'uploads/candidatos/';
 
@@ -848,7 +850,7 @@ class Candidato extends CI_Controller
         }
     }
 
-    private function tamanho_texto($valor)
+    protected function tamanho_texto($valor)
     {
         return function_exists('mb_strlen')
             ? mb_strlen($valor, 'UTF-8')

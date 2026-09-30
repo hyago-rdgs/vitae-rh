@@ -84,6 +84,11 @@ class Candidato_model extends CI_Model
                     INNER JOIN candidato_respostas cr
                         ON cr.candidato_grupo_codigo = cg.codigo
                     WHERE cf.candidato_codigo = c.codigo
+                      AND cf.codigo = (
+                        SELECT MAX(cf_atual.codigo)
+                        FROM candidato_formularios cf_atual
+                        WHERE cf_atual.candidato_codigo = c.codigo
+                      )
                       AND (
                         cr.valor_texto LIKE ' . $termo . '
                         OR cr.valor_json LIKE ' . $termo . '
@@ -127,6 +132,17 @@ class Candidato_model extends CI_Model
             'status'
         ]);
         $this->db->where('email', trim($email));
+        $this->db->where('status', 'ativo');
+        $this->db->where('exclusao IS NULL', NULL, FALSE);
+        $this->db->limit(1);
+
+        return $this->db->get($this->tabela)->row_array();
+    }
+
+    public function buscar_senha_por_codigo($codigo)
+    {
+        $this->db->select('senha');
+        $this->db->where('codigo', $codigo);
         $this->db->where('status', 'ativo');
         $this->db->where('exclusao IS NULL', NULL, FALSE);
         $this->db->limit(1);
