@@ -10,7 +10,7 @@ O escopo inicial prevê dados pessoais, escolaridade, experiências profissionai
 
 ## Estado atual
 
-O projeto está na fase de configuração administrativa do perfil do candidato. Já estão disponíveis:
+Foi concluída a fase de configuração administrativa do perfil do candidato. Já estão disponíveis:
 
 - Autenticação e controle de acesso por perfis e permissões.
 - Gerenciamento administrativo de usuários e perfis.
@@ -43,7 +43,7 @@ As alterações são preparadas na configuração administrativa, podem ser conf
 
 ## Tecnologias
 
-- PHP 7.4 ou superior, conforme a configuração do projeto.
+- PHP 7.4, conforme a faixa definida no `composer.json`.
 - CodeIgniter 3.
 - MySQL ou MariaDB.
 - HTML, CSS e JavaScript.
@@ -73,11 +73,10 @@ system/          Núcleo do CodeIgniter
 
 ## Próximas etapas
 
-1. Concluir a revisão da configuração administrativa do perfil.
-2. Implementar o cadastro e o portal de acesso do candidato, incluindo dados fixos, campos configurados, foto e currículo.
-3. Implementar a área de consulta e gestão de candidatos para o RH, com filtros e visualização detalhada.
-4. Desenvolver interfaces de integração para contato por e-mail e WhatsApp.
-5. Consolidar validações, segurança, auditoria e documentação do projeto.
+1. Implementar o cadastro e o portal de acesso do candidato, incluindo dados fixos, campos configurados, foto e currículo.
+2. Implementar a área de consulta e gestão de candidatos para o RH, com filtros e visualização detalhada.
+3. Desenvolver interfaces de integração para contato por e-mail e WhatsApp.
+4. Consolidar validações, segurança, auditoria e documentação do projeto.
 
 ## Licença
 
