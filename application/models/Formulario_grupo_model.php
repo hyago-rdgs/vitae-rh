@@ -75,6 +75,29 @@ class Formulario_grupo_model extends CI_Model
         return $this->db->get()->row_array();
     }
 
+    public function listar_por_secao($secao_codigo)
+    {
+        $this->db->select([
+            'codigo',
+            'secao_codigo',
+            'nome',
+            'descricao',
+            'repetivel',
+            'quantidade_minima',
+            'quantidade_maxima',
+            'ordem',
+            'ativo',
+            'cadastro',
+            'atualizacao'
+        ]);
+        $this->db->where('secao_codigo', $secao_codigo);
+        $this->db->where('exclusao IS NULL', NULL, FALSE);
+        $this->db->order_by('ordem', 'ASC');
+        $this->db->order_by('codigo', 'ASC');
+
+        return $this->db->get($this->tabela)->result_array();
+    }
+
     public function nome_em_uso($secao_codigo, $nome, $codigo = NULL)
     {
         $this->db->where('secao_codigo', $secao_codigo);

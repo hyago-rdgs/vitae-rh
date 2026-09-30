@@ -233,7 +233,6 @@ class Formulario_secao extends CI_Controller
         $this->db->trans_begin();
 
         $ordem_original = $secao['ordem'];
-
         $secao_atualizada = $this->formulario_secao_model
             ->atualizar_ordem(
                 $secao['codigo'],
@@ -247,7 +246,7 @@ class Formulario_secao extends CI_Controller
             )
             : FALSE;
 
-        $dados_novos = (
+        $secao_nova = (
             $secao_atualizada &&
             $adjacente_atualizada
         )
@@ -256,13 +255,39 @@ class Formulario_secao extends CI_Controller
             )
             : FALSE;
 
-        $auditoria_salva = $dados_novos
+        $secao_adjacente_nova = $secao_nova
+            ? $this->formulario_secao_model->buscar_por_codigo(
+                $secao_adjacente['codigo']
+            )
+            : FALSE;
+
+        $dados_anteriores = (
+            $secao_nova &&
+            $secao_adjacente_nova
+        )
+            ? [
+                'secao' => $secao,
+                'secao_adjacente' => $secao_adjacente
+            ]
+            : FALSE;
+
+        $dados_novos = (
+            $secao_nova &&
+            $secao_adjacente_nova
+        )
+            ? [
+                'secao' => $secao_nova,
+                'secao_adjacente' => $secao_adjacente_nova
+            ]
+            : FALSE;
+
+        $auditoria_salva = $dados_anteriores && $dados_novos
             ? $this->auditoria->registrar(
                 'formularios',
                 'SECAO_REORDENADA',
                 'formulario_secoes',
                 $secao['codigo'],
-                $secao,
+                $dados_anteriores,
                 $dados_novos
             )
             : FALSE;
@@ -270,6 +295,7 @@ class Formulario_secao extends CI_Controller
         if (
             !$secao_atualizada ||
             !$adjacente_atualizada ||
+            !$secao_adjacente_nova ||
             !$dados_novos ||
             !$auditoria_salva ||
             $this->db->trans_status() === FALSE
@@ -316,6 +342,9 @@ class Formulario_secao extends CI_Controller
             );
         }
 
+        $grupos = $this->formulario_grupo_model
+            ->listar_por_secao($secao['codigo']);
+
         $this->db->trans_begin();
 
         $grupos_excluidos = $this->formulario_grupo_model
@@ -333,7 +362,10 @@ class Formulario_secao extends CI_Controller
                 'SECAO_EXCLUIDA',
                 'formulario_secoes',
                 $secao['codigo'],
-                $secao,
+                [
+                    'secao' => $secao,
+                    'grupos' => $grupos
+                ],
                 NULL
             )
             : FALSE;

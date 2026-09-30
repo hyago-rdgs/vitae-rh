@@ -237,7 +237,7 @@ class Formulario_campo extends CI_Controller
             )
             : FALSE;
 
-        $dados_novos = (
+        $campo_novo = (
             $campo_atualizado &&
             $adjacente_atualizado
         )
@@ -246,13 +246,39 @@ class Formulario_campo extends CI_Controller
             )
             : FALSE;
 
-        $auditoria_salva = $dados_novos
+        $campo_adjacente_novo = $campo_novo
+            ? $this->formulario_campo_model->buscar_por_codigo(
+                $campo_adjacente['codigo']
+            )
+            : FALSE;
+
+        $dados_anteriores = (
+            $campo_novo &&
+            $campo_adjacente_novo
+        )
+            ? [
+                'campo' => $campo,
+                'campo_adjacente' => $campo_adjacente
+            ]
+            : FALSE;
+
+        $dados_novos = (
+            $campo_novo &&
+            $campo_adjacente_novo
+        )
+            ? [
+                'campo' => $campo_novo,
+                'campo_adjacente' => $campo_adjacente_novo
+            ]
+            : FALSE;
+
+        $auditoria_salva = $dados_anteriores && $dados_novos
             ? $this->auditoria->registrar(
                 'formularios',
                 'CAMPO_REORDENADO',
                 'formulario_campos',
                 $campo['codigo'],
-                $campo,
+                $dados_anteriores,
                 $dados_novos
             )
             : FALSE;
@@ -260,6 +286,7 @@ class Formulario_campo extends CI_Controller
         if (
             !$campo_atualizado ||
             !$adjacente_atualizado ||
+            !$campo_adjacente_novo ||
             !$dados_novos ||
             !$auditoria_salva ||
             $this->db->trans_status() === FALSE

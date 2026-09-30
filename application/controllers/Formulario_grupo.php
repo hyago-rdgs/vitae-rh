@@ -209,7 +209,7 @@ class Formulario_grupo extends CI_Controller
             )
             : FALSE;
 
-        $dados_novos = (
+        $grupo_novo = (
             $grupo_atualizado &&
             $adjacente_atualizado
         )
@@ -218,13 +218,39 @@ class Formulario_grupo extends CI_Controller
             )
             : FALSE;
 
-        $auditoria_salva = $dados_novos
+        $grupo_adjacente_novo = $grupo_novo
+            ? $this->formulario_grupo_model->buscar_por_codigo(
+                $grupo_adjacente['codigo']
+            )
+            : FALSE;
+
+        $dados_anteriores = (
+            $grupo_novo &&
+            $grupo_adjacente_novo
+        )
+            ? [
+                'grupo' => $grupo,
+                'grupo_adjacente' => $grupo_adjacente
+            ]
+            : FALSE;
+
+        $dados_novos = (
+            $grupo_novo &&
+            $grupo_adjacente_novo
+        )
+            ? [
+                'grupo' => $grupo_novo,
+                'grupo_adjacente' => $grupo_adjacente_novo
+            ]
+            : FALSE;
+
+        $auditoria_salva = $dados_anteriores && $dados_novos
             ? $this->auditoria->registrar(
                 'formularios',
                 'GRUPO_REORDENADO',
                 'formulario_grupos',
                 $grupo['codigo'],
-                $grupo,
+                $dados_anteriores,
                 $dados_novos
             )
             : FALSE;
@@ -232,6 +258,7 @@ class Formulario_grupo extends CI_Controller
         if (
             !$grupo_atualizado ||
             !$adjacente_atualizado ||
+            !$grupo_adjacente_novo ||
             !$dados_novos ||
             !$auditoria_salva ||
             $this->db->trans_status() === FALSE

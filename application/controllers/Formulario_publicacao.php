@@ -53,9 +53,27 @@ class Formulario_publicacao extends CI_Controller
             );
         }
 
+        $this->db->trans_begin();
+
+        $formulario_bloqueado = $this->formulario_model
+            ->bloquear_para_publicacao($formulario['codigo']);
+
+        if (!$formulario_bloqueado) {
+            $this->db->trans_rollback();
+
+            resposta_json(
+                FALSE,
+                'O formulário não foi encontrado.',
+                [],
+                404
+            );
+        }
+
         $resultado = $this->preparar_estrutura($formulario);
 
         if (!$resultado['sucesso']) {
+            $this->db->trans_rollback();
+
             resposta_json(
                 FALSE,
                 'O formulário possui pendências para publicação.',
@@ -64,15 +82,9 @@ class Formulario_publicacao extends CI_Controller
             );
         }
 
-        $this->db->trans_begin();
-
-        $formulario_bloqueado = $this->formulario_model
-            ->bloquear_para_publicacao($formulario['codigo']);
-        $versao = $formulario_bloqueado
-            ? $this->formulario_publicacao_model->proxima_versao(
-                $formulario['codigo']
-            )
-            : FALSE;
+        $versao = $this->formulario_publicacao_model->proxima_versao(
+            $formulario['codigo']
+        );
 
         $estrutura = $versao
             ? json_encode(
@@ -131,7 +143,6 @@ class Formulario_publicacao extends CI_Controller
             : FALSE;
 
         if (
-            !$formulario_bloqueado ||
             !$versao ||
             $estrutura === FALSE ||
             !$codigo ||
@@ -361,6 +372,12 @@ class Formulario_publicacao extends CI_Controller
                 'chave' => 'telefone',
                 'nome' => 'Telefone/WhatsApp',
                 'tipo' => 'telefone',
+                'obrigatorio' => TRUE
+            ],
+            [
+                'chave' => 'senha',
+                'nome' => 'Senha',
+                'tipo' => 'senha',
                 'obrigatorio' => TRUE
             ],
             [
