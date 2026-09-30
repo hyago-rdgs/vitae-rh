@@ -38,6 +38,85 @@ class Candidato_model extends CI_Model
         return $this->db->get($this->tabela)->row_array();
     }
 
+    public function listar_para_administracao($filtros, $limite, $offset)
+    {
+        $this->consultar_para_administracao($filtros);
+        $this->db->select([
+            'c.codigo',
+            'c.nome_completo',
+            'c.email',
+            'c.telefone',
+            'c.status',
+            'c.cadastro'
+        ]);
+        $this->db->order_by('c.cadastro', 'DESC');
+        $this->db->order_by('c.codigo', 'DESC');
+        $this->db->limit($limite, $offset);
+
+        return $this->db->get()->result_array();
+    }
+
+    public function contar_para_administracao($filtros)
+    {
+        $this->consultar_para_administracao($filtros);
+        $this->db->select('c.codigo');
+
+        return $this->db->count_all_results();
+    }
+
+    private function consultar_para_administracao($filtros)
+    {
+        $this->db->from($this->tabela . ' c');
+        $this->db->where('c.exclusao IS NULL', NULL, FALSE);
+
+        if ($filtros['termo'] !== '') {
+            $this->db->group_start();
+            $this->db->like('c.nome_completo', $filtros['termo']);
+            $this->db->or_like('c.email', $filtros['termo']);
+            $this->db->or_like('c.telefone', $filtros['termo']);
+            $termo = $this->db->escape('%' . $filtros['termo'] . '%');
+            $this->db->or_where(
+                'EXISTS (
+                    SELECT 1
+                    FROM candidato_formularios cf
+                    INNER JOIN candidato_grupos cg
+                        ON cg.candidato_formulario_codigo = cf.codigo
+                    INNER JOIN candidato_respostas cr
+                        ON cr.candidato_grupo_codigo = cg.codigo
+                    WHERE cf.candidato_codigo = c.codigo
+                      AND (
+                        cr.valor_texto LIKE ' . $termo . '
+                        OR cr.valor_json LIKE ' . $termo . '
+                        OR CAST(cr.valor_numero AS CHAR) LIKE ' . $termo . '
+                        OR CAST(cr.valor_data AS CHAR) LIKE ' . $termo . '
+                        OR CAST(cr.valor_booleano AS CHAR) LIKE ' . $termo . '
+                      )
+                )',
+                NULL,
+                FALSE
+            );
+            $this->db->group_end();
+        }
+
+        if ($filtros['status'] !== '') {
+            $this->db->where('c.status', $filtros['status']);
+        }
+
+        if ($filtros['data_inicio'] !== '') {
+            $this->db->where(
+                'c.cadastro >=',
+                $filtros['data_inicio'] . ' 00:00:00'
+            );
+        }
+
+        if ($filtros['data_fim'] !== '') {
+            $this->db->where(
+                'c.cadastro <=',
+                $filtros['data_fim'] . ' 23:59:59'
+            );
+        }
+    }
+
     public function buscar_para_autenticacao($email)
     {
         $this->db->select([

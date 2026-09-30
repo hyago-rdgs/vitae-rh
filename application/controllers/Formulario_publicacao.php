@@ -384,7 +384,7 @@ class Formulario_publicacao extends CI_Controller
                 'chave' => 'foto_perfil',
                 'nome' => 'Foto de perfil',
                 'tipo' => 'arquivo_imagem',
-                'obrigatorio' => FALSE
+                'obrigatorio' => TRUE
             ],
             [
                 'chave' => 'curriculo',

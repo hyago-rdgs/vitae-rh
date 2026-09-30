@@ -51,5 +51,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 */
 
 $route['default_controller'] = 'principal';
+$route['candidatos'] = 'candidatos/index';
+$route['candidatos/detalhe/(:num)'] = 'candidatos/detalhe/$1';
+$route['candidatos/foto/(:num)'] = 'candidatos/foto/$1';
+$route['candidatos/curriculo/(:num)'] = 'candidatos/curriculo/$1';
+$route['candidato'] = 'candidato/cadastro';
+$route['candidato/cadastro'] = 'candidato/cadastro';
+$route['candidato/sucesso'] = 'candidato/sucesso';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;

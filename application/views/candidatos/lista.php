@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Consulta de candidatos cadastrados no Vitae RH">
+    <title>Candidatos | Vitae RH</title>
+
+    <?php $this->load->view('css'); ?>
+</head>
+
+<body class="bg-body-tertiary">
+
+    <?php $this->load->view('nav'); ?>
+
+    <main class="container-fluid px-3 px-lg-4 py-4 py-lg-5">
+        <header class="mb-4">
+            <h1 class="h3 mb-1">Candidatos</h1>
+            <p class="text-body-secondary mb-0">
+                Consulte os perfis enviados e acesse os currículos cadastrados.
+            </p>
+        </header>
+
+        <?php if (!empty($erros_filtro)): ?>
+            <div class="alert alert-warning" role="alert">
+                <ul class="mb-0">
+                    <?php foreach ($erros_filtro as $erro): ?>
+                        <li><?= html_escape($erro); ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
+
+        <section aria-labelledby="filtros-title" class="card border shadow-sm mb-4">
+            <div class="card-body">
+                <h2 class="h6 fw-semibold mb-3" id="filtros-title">Filtros</h2>
+                <form action="<?= base_url('candidatos'); ?>" method="get">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-12 col-lg-5">
+                            <label class="form-label" for="termo">Buscar candidato</label>
+                            <input class="form-control" id="termo" name="termo"
+                                placeholder="Contato ou informação do perfil" type="search"
+                                value="<?= html_escape($filtros['termo']); ?>">
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-2">
+                            <label class="form-label" for="status">Situação</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="">Todas</option>
+                                <option value="ativo" <?= $filtros['status'] === 'ativo' ? 'selected' : ''; ?>>Ativo</option>
+                                <option value="inativo" <?= $filtros['status'] === 'inativo' ? 'selected' : ''; ?>>Inativo</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-2">
+                            <label class="form-label" for="data_inicio">Cadastro a partir de</label>
+                            <input class="form-control" id="data_inicio" name="data_inicio"
+                                type="date" value="<?= html_escape($filtros['data_inicio']); ?>">
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-2">
+                            <label class="form-label" for="data_fim">Cadastro até</label>
+                            <input class="form-control" id="data_fim" name="data_fim"
+                                type="date" value="<?= html_escape($filtros['data_fim']); ?>">
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-1 d-grid">
+                            <button class="btn btn-success" type="submit">
+                                <i class="fa-solid fa-filter" aria-hidden="true"></i>
+                                <span class="visually-hidden">Filtrar</span>
+                            </button>
+                        </div>
+                    </div>
+                    <?php if ($filtros['termo'] !== '' || $filtros['status'] !== '' || $filtros['data_inicio'] !== '' || $filtros['data_fim'] !== ''): ?>
+                        <div class="mt-3">
+                            <a class="small" href="<?= base_url('candidatos'); ?>">Limpar filtros</a>
+                        </div>
+                    <?php endif; ?>
+                </form>
+            </div>
+        </section>
+
+        <section aria-labelledby="lista-candidatos-title" class="card border shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h2 class="h6 fw-semibold mb-1" id="lista-candidatos-title">Perfis cadastrados</h2>
+                <p class="small text-body-secondary mb-0">
+                    <?= (int) $total; ?> candidato(s) encontrado(s)
+                </p>
+            </div>
+
+            <?php if (!empty($candidatos)): ?>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr class="small text-secondary text-uppercase">
+                                <th class="px-3 py-3" scope="col">Candidato</th>
+                                <th class="py-3" scope="col">Telefone</th>
+                                <th class="py-3" scope="col">Cadastro</th>
+                                <th class="py-3 text-center" scope="col">Situação</th>
+                                <th class="px-3 py-3 text-end" scope="col">Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($candidatos as $candidato): ?>
+                                <tr>
+                                    <td class="px-3">
+                                        <a class="text-decoration-none text-body fw-semibold"
+                                            href="<?= base_url('candidatos/detalhe/' . (int) $candidato['codigo']); ?>">
+                                            <?= html_escape($candidato['nome_completo']); ?>
+                                        </a>
+                                        <div class="small text-body-secondary">
+                                            <?= html_escape($candidato['email']); ?>
+                                        </div>
+                                    </td>
+                                    <td><?= html_escape($candidato['telefone']); ?></td>
+                                    <td><?= html_escape(date('d/m/Y H:i', strtotime($candidato['cadastro']))); ?></td>
+                                    <td class="text-center">
+                                        <?php if ($candidato['status'] === 'ativo'): ?>
+                                            <span class="badge text-bg-success">Ativo</span>
+                                        <?php else: ?>
+                                            <span class="badge text-bg-secondary">Inativo</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="px-3 text-end">
+                                        <a class="btn btn-sm btn-outline-success"
+                                            href="<?= base_url('candidatos/detalhe/' . (int) $candidato['codigo']); ?>">
+                                            <i class="fa-regular fa-eye me-1" aria-hidden="true"></i>
+                                            Ver perfil
+                                        </a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+
+                <?php if ($total_paginas > 1): ?>
+                    <?php
+                    $parametros = array_filter($filtros, function ($valor) {
+                        return $valor !== '';
+                    });
+                    $gerar_url = function ($numero) use ($parametros) {
+                        $parametros['pagina'] = $numero;
+                        return base_url('candidatos') . '?' . http_build_query($parametros);
+                    };
+                    ?>
+                    <nav class="p-3 border-top" aria-label="Paginação de candidatos">
+                        <ul class="pagination pagination-sm justify-content-end mb-0">
+                            <li class="page-item <?= $pagina <= 1 ? 'disabled' : ''; ?>">
+                                <a class="page-link" href="<?= $pagina > 1 ? $gerar_url($pagina - 1) : '#'; ?>"
+                                    aria-label="Página anterior">Anterior</a>
+                            </li>
+                            <li class="page-item disabled">
+                                <span class="page-link">Página <?= (int) $pagina; ?> de <?= (int) $total_paginas; ?></span>
+                            </li>
+                            <li class="page-item <?= $pagina >= $total_paginas ? 'disabled' : ''; ?>">
+                                <a class="page-link" href="<?= $pagina < $total_paginas ? $gerar_url($pagina + 1) : '#'; ?>"
+                                    aria-label="Próxima página">Próxima</a>
+                            </li>
+                        </ul>
+                    </nav>
+                <?php endif; ?>
+            <?php else: ?>
+                <div class="card-body py-5 text-center">
+                    <i class="fa-regular fa-folder-open fa-2x text-body-tertiary mb-3" aria-hidden="true"></i>
+                    <p class="fw-semibold mb-1">Nenhum candidato encontrado</p>
+                    <p class="small text-body-secondary mb-0">Tente alterar ou limpar os filtros.</p>
+                </div>
+            <?php endif; ?>
+        </section>
+    </main>
+
+    <?php $this->load->view('js'); ?>
+</body>
+
+</html>

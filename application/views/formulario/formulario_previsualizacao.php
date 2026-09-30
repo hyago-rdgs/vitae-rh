@@ -69,7 +69,7 @@
                         <input class="form-control" id="prev_senha" type="password" disabled>
                     </div>
                     <div class="col-12 col-lg-6">
-                        <label class="form-label fw-semibold" for="prev_foto">Foto de perfil</label>
+                        <label class="form-label fw-semibold" for="prev_foto">Foto de perfil <span class="text-danger">*</span></label>
                         <input class="form-control" id="prev_foto" type="file" disabled>
                     </div>
                     <div class="col-12 col-lg-6">

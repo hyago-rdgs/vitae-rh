@@ -28,6 +28,10 @@ docs/*
 uploads/documentos/*
 !uploads/documentos/.htaccess
 
+uploads/candidatos/*
+!uploads/candidatos/.htaccess
+!uploads/candidatos/index.html
+
 # IDE Files
 #-------------------------
 /nbproject/

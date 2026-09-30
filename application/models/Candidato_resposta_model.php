@@ -17,7 +17,38 @@ class Candidato_resposta_model extends CI_Model
     {
         parent::__construct();
         $this->load->database();
-}
+    }
+
+    public function listar_por_candidato_formulario($candidato_formulario_codigo)
+    {
+        $this->db->select([
+            'cg.codigo AS candidato_grupo_codigo',
+            'cg.grupo_codigo',
+            'cg.indice',
+            'cr.campo_chave',
+            'cr.valor_texto',
+            'cr.valor_numero',
+            'cr.valor_data',
+            'cr.valor_booleano',
+            'cr.valor_json'
+        ]);
+        $this->db->from('candidato_grupos cg');
+        $this->db->join(
+            $this->tabela . ' cr',
+            'cr.candidato_grupo_codigo = cg.codigo',
+            'LEFT'
+        );
+        $this->db->where(
+            'cg.candidato_formulario_codigo',
+            $candidato_formulario_codigo
+        );
+        $this->db->order_by('cg.grupo_codigo', 'ASC');
+        $this->db->order_by('cg.indice', 'ASC');
+        $this->db->order_by('cr.codigo', 'ASC');
+
+        return $this->db->get()->result_array();
+    }
+
     public function listar_por_grupo($candidato_grupo_codigo)
     {
         $this->db->select([

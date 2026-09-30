@@ -48,6 +48,16 @@ $formulario_ativo = in_array(
                     </li>
                     <?php endif; ?>
 
+                    <?php if ($this->controle_acesso->tem_permissao('candidatos.consultar')): ?>
+                    <li class="nav-item">
+                        <a class="nav-link <?= $modulo_atual == 'candidatos' ? 'active fw-semibold' : ''; ?>"
+                            <?= $modulo_atual == 'candidatos' ? 'aria-current="page"' : ''; ?>
+                            href="<?= base_url('candidatos'); ?>">
+                            Candidatos
+                        </a>
+                    </li>
+                    <?php endif; ?>
+
                     <?php if ($this->controle_acesso->tem_permissao('formularios.gerenciar')): ?>
                     <li class="nav-item">
                         <a class="nav-link <?= $formulario_ativo ? 'active fw-semibold' : ''; ?>"
