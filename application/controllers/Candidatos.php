@@ -16,6 +16,7 @@ class Candidatos extends CI_Controller
         $this->load->model('candidato_formulario_model');
         $this->load->model('candidato_resposta_model');
         $this->load->model('formulario_publicacao_model');
+        $this->load->model('candidato_historico_model');
     }
 
     public function index()
@@ -27,6 +28,7 @@ class Candidatos extends CI_Controller
         $filtros = [
             'termo' => $this->obter_filtro_texto('termo', 100),
             'status' => $this->obter_status(),
+            'situacao_seletiva' => $this->obter_situacao_seletiva(),
             'data_inicio' => $this->obter_data('data_inicio'),
             'data_fim' => $this->obter_data('data_fim')
         ];
@@ -70,7 +72,8 @@ class Candidatos extends CI_Controller
             'erros_filtro' => $erros_filtro,
             'total' => $total,
             'pagina' => $pagina,
-            'total_paginas' => $total_paginas
+            'total_paginas' => $total_paginas,
+            'situacoes_seletivas' => $this->candidato_historico_model->situacoes()
         ]);
     }
 
@@ -117,8 +120,105 @@ class Candidatos extends CI_Controller
         $this->load->view('candidatos/detalhe', [
             'candidato' => $candidato,
             'formulario' => $formulario,
-            'estrutura' => $this->montar_perfil($estrutura, $respostas)
+            'estrutura' => $this->montar_perfil($estrutura, $respostas),
+            'situacoes_seletivas' => $this->candidato_historico_model->situacoes(),
+            'historico' => $this->candidato_historico_model
+                ->listar_por_candidato($candidato['codigo']),
+            'pode_gerenciar' => $this->controle_acesso
+                ->tem_permissao('candidatos.gerenciar'),
+            'mensagem_gestao' => $this->session->flashdata('candidato_gestao_mensagem'),
+            'erro_gestao' => $this->session->flashdata('candidato_gestao_erro')
         ]);
+    }
+
+    public function atualizar_situacao($codigo = NULL)
+    {
+        $this->exigir_gerenciamento();
+
+        if ($this->input->method() !== 'post' || !$this->codigo_valido($codigo)) {
+            show_404();
+        }
+
+        $situacao = $this->input->post('situacao_seletiva', TRUE);
+        if (!$this->candidato_historico_model->situacao_valida($situacao)) {
+            $this->session->set_flashdata('candidato_gestao_erro', 'A situação informada não é válida.');
+            redirect('candidatos/detalhe/' . (int) $codigo);
+            return;
+        }
+
+        $this->db->trans_begin();
+        $candidato = $this->candidato_model->buscar_situacao_seletiva((int) $codigo, TRUE);
+
+        if (!$candidato) {
+            $this->db->trans_rollback();
+            show_404();
+        }
+
+        $atual = $candidato['situacao_seletiva'];
+        if ($atual === $situacao) {
+            $this->db->trans_rollback();
+            $this->session->set_flashdata('candidato_gestao_mensagem', 'A situação não foi alterada.');
+            redirect('candidatos/detalhe/' . (int) $codigo);
+            return;
+        }
+
+        $atualizado = $this->candidato_model->atualizar_situacao_seletiva($codigo, $situacao);
+        $registrado = $atualizado && $this->candidato_historico_model->registrar_situacao(
+            $codigo,
+            $this->controle_acesso->get('codigo'),
+            $atual,
+            $situacao
+        );
+
+        if (!$registrado || $this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            $this->session->set_flashdata('candidato_gestao_erro', 'Não foi possível atualizar a situação.');
+        } else {
+            $this->db->trans_commit();
+            $this->session->set_flashdata('candidato_gestao_mensagem', 'Situação atualizada.');
+        }
+
+        redirect('candidatos/detalhe/' . (int) $codigo);
+    }
+
+    public function adicionar_anotacao($codigo = NULL)
+    {
+        $this->exigir_gerenciamento();
+
+        if ($this->input->method() !== 'post' || !$this->codigo_valido($codigo)) {
+            show_404();
+        }
+
+        $candidato = $this->candidato_model->buscar_por_codigo((int) $codigo);
+        $anotacao = $this->input->post('anotacao', TRUE);
+        $anotacao = is_string($anotacao) ? trim($anotacao) : '';
+
+        $tamanho_anotacao = function_exists('mb_strlen')
+            ? mb_strlen($anotacao, 'UTF-8')
+            : strlen($anotacao);
+
+        if (!$candidato || $anotacao === '' || $tamanho_anotacao > 5000) {
+            $this->session->set_flashdata('candidato_gestao_erro', 'Informe uma anotação com até 5.000 caracteres.');
+            redirect('candidatos/detalhe/' . (int) $codigo);
+            return;
+        }
+
+        $salvo = $this->candidato_historico_model->registrar_anotacao(
+            $codigo,
+            $this->controle_acesso->get('codigo'),
+            $anotacao
+        );
+
+        $this->session->set_flashdata(
+            $salvo ? 'candidato_gestao_mensagem' : 'candidato_gestao_erro',
+            $salvo ? 'Anotação registrada.' : 'Não foi possível registrar a anotação.'
+        );
+        redirect('candidatos/detalhe/' . (int) $codigo);
+    }
+
+    private function exigir_gerenciamento()
+    {
+        $this->controle_acesso->valida_permissao('candidatos.gerenciar');
     }
 
     public function foto($codigo = NULL)
@@ -337,6 +437,14 @@ class Candidatos extends CI_Controller
 
         return is_string($status) && in_array($status, ['ativo', 'inativo'], TRUE)
             ? $status
+            : '';
+    }
+
+    private function obter_situacao_seletiva()
+    {
+        $situacao = $this->input->get('situacao_seletiva', TRUE);
+        return $this->candidato_historico_model->situacao_valida($situacao)
+            ? $situacao
             : '';
     }
 

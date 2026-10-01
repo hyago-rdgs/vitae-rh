@@ -37,18 +37,30 @@
                 <h2 class="h6 fw-semibold mb-3" id="filtros-title">Filtros</h2>
                 <form action="<?= base_url('candidatos'); ?>" method="get">
                     <div class="row g-3 align-items-end">
-                        <div class="col-12 col-lg-5">
+                        <div class="col-12 col-lg-3">
                             <label class="form-label" for="termo">Buscar candidato</label>
                             <input class="form-control" id="termo" name="termo"
                                 placeholder="Contato ou informação do perfil" type="search"
                                 value="<?= html_escape($filtros['termo']); ?>">
                         </div>
                         <div class="col-12 col-sm-6 col-lg-2">
-                            <label class="form-label" for="status">Situação</label>
+                            <label class="form-label" for="status">Conta</label>
                             <select class="form-select" id="status" name="status">
                                 <option value="">Todas</option>
                                 <option value="ativo" <?= $filtros['status'] === 'ativo' ? 'selected' : ''; ?>>Ativo</option>
                                 <option value="inativo" <?= $filtros['status'] === 'inativo' ? 'selected' : ''; ?>>Inativo</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-2">
+                            <label class="form-label" for="situacao_seletiva">Processo seletivo</label>
+                            <select class="form-select" id="situacao_seletiva" name="situacao_seletiva">
+                                <option value="">Todas</option>
+                                <?php foreach ($situacoes_seletivas as $chave => $rotulo): ?>
+                                    <option value="<?= html_escape($chave); ?>"
+                                        <?= $filtros['situacao_seletiva'] === $chave ? 'selected' : ''; ?>>
+                                        <?= html_escape($rotulo); ?>
+                                    </option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
                         <div class="col-12 col-sm-6 col-lg-2">
@@ -68,7 +80,7 @@
                             </button>
                         </div>
                     </div>
-                    <?php if ($filtros['termo'] !== '' || $filtros['status'] !== '' || $filtros['data_inicio'] !== '' || $filtros['data_fim'] !== ''): ?>
+                    <?php if ($filtros['termo'] !== '' || $filtros['status'] !== '' || $filtros['situacao_seletiva'] !== '' || $filtros['data_inicio'] !== '' || $filtros['data_fim'] !== ''): ?>
                         <div class="mt-3">
                             <a class="small" href="<?= base_url('candidatos'); ?>">Limpar filtros</a>
                         </div>
@@ -93,7 +105,7 @@
                                 <th class="px-3 py-3" scope="col">Candidato</th>
                                 <th class="py-3" scope="col">Telefone</th>
                                 <th class="py-3" scope="col">Cadastro</th>
-                                <th class="py-3 text-center" scope="col">Situação</th>
+                                <th class="py-3 text-center" scope="col">Processo seletivo</th>
                                 <th class="px-3 py-3 text-end" scope="col">Ação</th>
                             </tr>
                         </thead>
@@ -112,11 +124,7 @@
                                     <td><?= html_escape($candidato['telefone']); ?></td>
                                     <td><?= html_escape(date('d/m/Y H:i', strtotime($candidato['cadastro']))); ?></td>
                                     <td class="text-center">
-                                        <?php if ($candidato['status'] === 'ativo'): ?>
-                                            <span class="badge text-bg-success">Ativo</span>
-                                        <?php else: ?>
-                                            <span class="badge text-bg-secondary">Inativo</span>
-                                        <?php endif; ?>
+                                        <?= html_escape($situacoes_seletivas[$candidato['situacao_seletiva']] ?? 'Recebido'); ?>
                                     </td>
                                     <td class="px-3 text-end">
                                         <a class="btn btn-sm btn-outline-success"

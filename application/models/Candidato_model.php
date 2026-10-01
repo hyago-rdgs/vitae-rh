@@ -27,6 +27,7 @@ class Candidato_model extends CI_Model
             'consentimento_lgpd_versao',
             'consentimento_lgpd_em',
             'status',
+            'situacao_seletiva',
             'ultimo_acesso',
             'cadastro',
             'atualizacao'
@@ -47,6 +48,7 @@ class Candidato_model extends CI_Model
             'c.email',
             'c.telefone',
             'c.status',
+            'c.situacao_seletiva',
             'c.cadastro'
         ]);
         $this->db->order_by('c.cadastro', 'DESC');
@@ -105,6 +107,10 @@ class Candidato_model extends CI_Model
 
         if ($filtros['status'] !== '') {
             $this->db->where('c.status', $filtros['status']);
+        }
+
+        if (!empty($filtros['situacao_seletiva'])) {
+            $this->db->where('c.situacao_seletiva', $filtros['situacao_seletiva']);
         }
 
         if ($filtros['data_inicio'] !== '') {
@@ -197,6 +203,25 @@ class Candidato_model extends CI_Model
             $this->tabela,
             ['ultimo_acesso' => date('Y-m-d H:i:s')]
         );
+    }
+
+    public function atualizar_situacao_seletiva($codigo, $situacao)
+    {
+        $this->db->where('codigo', $codigo);
+        $this->db->where('exclusao IS NULL', NULL, FALSE);
+
+        return $this->db->update($this->tabela, [
+            'situacao_seletiva' => $situacao,
+            'atualizacao' => date('Y-m-d H:i:s')
+        ]);
+    }
+
+    public function buscar_situacao_seletiva($codigo, $bloquear = FALSE)
+    {
+        $sql = 'SELECT situacao_seletiva FROM ' . $this->db->dbprefix($this->tabela) .
+            ' WHERE codigo = ? AND exclusao IS NULL LIMIT 1' .
+            ($bloquear ? ' FOR UPDATE' : '');
+        return $this->db->query($sql, [$codigo])->row_array();
     }
 
     public function excluir($codigo)

@@ -29,11 +29,9 @@
                     <div class="flex-grow-1">
                         <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
                             <h1 class="h3 mb-0"><?= html_escape($candidato['nome_completo']); ?></h1>
-                            <?php if ($candidato['status'] === 'ativo'): ?>
-                                <span class="badge text-bg-success">Ativo</span>
-                            <?php else: ?>
-                                <span class="badge text-bg-secondary">Inativo</span>
-                            <?php endif; ?>
+                            <span class="badge text-bg-success">
+                                <?= html_escape($situacoes_seletivas[$candidato['situacao_seletiva']] ?? 'Recebido'); ?>
+                            </span>
                         </div>
                         <p class="text-body-secondary mb-1">
                             <i class="fa-regular fa-envelope me-1" aria-hidden="true"></i>
@@ -49,8 +47,99 @@
                         <i class="fa-regular fa-file-lines me-2" aria-hidden="true"></i>
                         Baixar currículo
                     </a>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a class="btn btn-outline-secondary" href="mailto:<?= html_escape($candidato['email']); ?>">
+                            <i class="fa-regular fa-envelope me-1" aria-hidden="true"></i>E-mail
+                        </a>
+                        <?php $telefone_whatsapp = preg_replace('/\D+/', '', $candidato['telefone']); ?>
+                        <?php if (strlen($telefone_whatsapp) === 10 || strlen($telefone_whatsapp) === 11): ?>
+                            <?php $telefone_whatsapp = '55' . $telefone_whatsapp; ?>
+                        <?php endif; ?>
+                        <a class="btn btn-outline-success" target="_blank" rel="noopener noreferrer"
+                            href="https://wa.me/<?= html_escape($telefone_whatsapp); ?>">
+                            <i class="fa-brands fa-whatsapp me-1" aria-hidden="true"></i>WhatsApp
+                        </a>
+                    </div>
                 </div>
             </div>
+        </section>
+
+        <?php if (!empty($mensagem_gestao)): ?>
+            <div class="alert alert-success" role="status"><?= html_escape($mensagem_gestao); ?></div>
+        <?php endif; ?>
+        <?php if (!empty($erro_gestao)): ?>
+            <div class="alert alert-danger" role="alert"><?= html_escape($erro_gestao); ?></div>
+        <?php endif; ?>
+
+        <?php if ($pode_gerenciar): ?>
+            <section class="card border shadow-sm mb-4" aria-labelledby="gestao-title">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h6 fw-semibold mb-0" id="gestao-title">Gestão do processo seletivo</h2>
+                </div>
+                <div class="card-body">
+                    <form action="<?= base_url('candidatos/situacao/' . (int) $candidato['codigo']); ?>"
+                        method="post" class="row g-3 align-items-end">
+                        <div class="col-12 col-md-8">
+                            <label class="form-label" for="situacao_seletiva_atualizar">Situação</label>
+                            <select class="form-select" id="situacao_seletiva_atualizar" name="situacao_seletiva" required>
+                                <?php foreach ($situacoes_seletivas as $chave => $rotulo): ?>
+                                    <option value="<?= html_escape($chave); ?>"
+                                        <?= $candidato['situacao_seletiva'] === $chave ? 'selected' : ''; ?>>
+                                        <?= html_escape($rotulo); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-4 d-grid">
+                            <button class="btn btn-success" type="submit">Atualizar situação</button>
+                        </div>
+                    </form>
+                    <hr>
+                    <form action="<?= base_url('candidatos/anotacao/' . (int) $candidato['codigo']); ?>" method="post">
+                        <label class="form-label" for="anotacao">Anotação interna</label>
+                        <textarea class="form-control" id="anotacao" name="anotacao" rows="3"
+                            maxlength="5000" required></textarea>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <small class="text-body-secondary">Visível apenas à equipe autorizada do RH.</small>
+                            <button class="btn btn-outline-success" type="submit">Registrar anotação</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        <?php endif; ?>
+
+        <section class="card border shadow-sm mb-4" aria-labelledby="historico-title">
+            <div class="card-header bg-white py-3">
+                <h2 class="h6 fw-semibold mb-0" id="historico-title">Histórico interno</h2>
+            </div>
+            <?php if (empty($historico)): ?>
+                <div class="card-body"><p class="small text-body-secondary mb-0">Nenhum registro interno até o momento.</p></div>
+            <?php else: ?>
+                <ul class="list-group list-group-flush">
+                    <?php foreach ($historico as $evento): ?>
+                        <li class="list-group-item px-3 py-3">
+                            <div class="d-flex flex-wrap justify-content-between gap-2 mb-1">
+                                <strong><?= $evento['tipo'] === 'situacao' ? 'Mudança de situação' : 'Anotação'; ?></strong>
+                                <span class="small text-body-secondary">
+                                    <?= html_escape(date('d/m/Y H:i', strtotime($evento['cadastro']))); ?>
+                                </span>
+                            </div>
+                            <div class="small text-body-secondary mb-2">
+                                <?= html_escape($evento['usuario_nome'] ?? 'Usuário indisponível'); ?>
+                            </div>
+                            <?php if ($evento['tipo'] === 'situacao'): ?>
+                                <p class="mb-0">
+                                    <?= html_escape($situacoes_seletivas[$evento['situacao_anterior']] ?? $evento['situacao_anterior']); ?>
+                                    <i class="fa-solid fa-arrow-right mx-1" aria-hidden="true"></i>
+                                    <?= html_escape($situacoes_seletivas[$evento['situacao_nova']] ?? $evento['situacao_nova']); ?>
+                                </p>
+                            <?php else: ?>
+                                <p class="mb-0 text-break"><?= nl2br(html_escape($evento['anotacao'])); ?></p>
+                            <?php endif; ?>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
         </section>
 
         <section class="card border shadow-sm mb-4" aria-labelledby="cadastro-title">

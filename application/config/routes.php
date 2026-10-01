@@ -53,6 +53,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $route['default_controller'] = 'principal';
 $route['candidatos'] = 'candidatos/index';
 $route['candidatos/detalhe/(:num)'] = 'candidatos/detalhe/$1';
+$route['candidatos/situacao/(:num)'] = 'candidatos/atualizar_situacao/$1';
+$route['candidatos/anotacao/(:num)'] = 'candidatos/adicionar_anotacao/$1';
 $route['candidatos/foto/(:num)'] = 'candidatos/foto/$1';
 $route['candidatos/curriculo/(:num)'] = 'candidatos/curriculo/$1';
 $route['candidato'] = 'candidato/cadastro';
