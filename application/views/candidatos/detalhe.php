@@ -70,6 +70,8 @@
         <?php if (!empty($erro_gestao)): ?>
             <div class="alert alert-danger" role="alert"><?= html_escape($erro_gestao); ?></div>
         <?php endif; ?>
+        <?php if (!empty($mensagem_comunicacao)): ?><div class="alert alert-success" role="status"><?= html_escape($mensagem_comunicacao); ?></div><?php endif; ?>
+        <?php if (!empty($erro_comunicacao)): ?><div class="alert alert-danger" role="alert"><?= html_escape($erro_comunicacao); ?></div><?php endif; ?>
 
         <?php if ($pode_gerenciar): ?>
             <section class="card border shadow-sm mb-4" aria-labelledby="gestao-title">
@@ -107,6 +109,30 @@
                 </div>
             </section>
         <?php endif; ?>
+
+        <?php if ($pode_comunicar && !empty($modelos_mensagem)): ?>
+            <section class="card border shadow-sm mb-4" aria-labelledby="comunicacao-title">
+                <div class="card-header bg-white py-3"><h2 class="h6 fw-semibold mb-0" id="comunicacao-title">Enviar mensagem</h2></div>
+                <div class="card-body">
+                    <form method="post" action="<?= base_url('candidatos/enviar-mensagem/' . (int) $candidato['codigo']); ?>" class="row g-3 align-items-end">
+                        <div class="col-12 col-md-8"><label class="form-label" for="modelo_codigo">Modelo</label>
+                            <select class="form-select" id="modelo_codigo" name="modelo_codigo" required><option value="">Selecione um modelo</option>
+                                <?php foreach ($modelos_mensagem as $modelo): ?><option value="<?= (int) $modelo['codigo']; ?>"><?= html_escape($modelo['nome']); ?></option><?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-4 d-grid"><button class="btn btn-success" type="submit">Enviar por e-mail</button></div>
+                    </form>
+                </div>
+            </section>
+        <?php endif; ?>
+
+        <section class="card border shadow-sm mb-4" aria-labelledby="envios-title">
+            <div class="card-header bg-white py-3"><h2 class="h6 fw-semibold mb-0" id="envios-title">Mensagens enviadas</h2></div>
+            <?php if (empty($envios)): ?><div class="card-body"><p class="small text-body-secondary mb-0">Nenhuma mensagem enviada.</p></div>
+            <?php else: ?><div class="table-responsive"><table class="table table-sm align-middle mb-0"><thead class="table-light"><tr><th class="px-3">Modelo</th><th>Assunto</th><th>Status</th><th>Data</th></tr></thead><tbody>
+                <?php foreach ($envios as $envio): ?><tr><td class="px-3"><?= html_escape($envio['modelo_nome'] ?? 'Modelo removido'); ?></td><td><?= html_escape($envio['assunto']); ?></td><td><?= $envio['status'] === 'enviado' ? '<span class="badge text-bg-success">Enviado</span>' : '<span class="badge text-bg-danger">Erro</span>'; ?></td><td><?= html_escape(date('d/m/Y H:i', strtotime($envio['cadastro']))); ?></td></tr><?php endforeach; ?>
+            </tbody></table></div><?php endif; ?>
+        </section>
 
         <section class="card border shadow-sm mb-4" aria-labelledby="historico-title">
             <div class="card-header bg-white py-3">

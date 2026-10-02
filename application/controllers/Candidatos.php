@@ -17,6 +17,7 @@ class Candidatos extends CI_Controller
         $this->load->model('candidato_resposta_model');
         $this->load->model('formulario_publicacao_model');
         $this->load->model('candidato_historico_model');
+        $this->load->model('candidato_comunicacao_model');
     }
 
     public function index()
@@ -29,6 +30,8 @@ class Candidatos extends CI_Controller
             'termo' => $this->obter_filtro_texto('termo', 100),
             'status' => $this->obter_status(),
             'situacao_seletiva' => $this->obter_situacao_seletiva(),
+            'campo_chave' => $this->obter_filtro_texto('campo_chave', 100),
+            'valor_campo' => $this->obter_filtro_texto('valor_campo', 150),
             'data_inicio' => $this->obter_data('data_inicio'),
             'data_fim' => $this->obter_data('data_fim')
         ];
@@ -73,7 +76,14 @@ class Candidatos extends CI_Controller
             'total' => $total,
             'pagina' => $pagina,
             'total_paginas' => $total_paginas,
-            'situacoes_seletivas' => $this->candidato_historico_model->situacoes()
+            'situacoes_seletivas' => $this->candidato_historico_model->situacoes(),
+            'campos_filtro' => $this->candidato_comunicacao_model->campos_publicados(),
+            'modelos_mensagem' => $this->tem_permissao_comunicacao()
+                ? $this->candidato_comunicacao_model->listar_modelos_ativos()
+                : [],
+            'pode_comunicar' => $this->tem_permissao_comunicacao(),
+            'mensagem_comunicacao' => $this->session->flashdata('candidato_comunicacao_mensagem'),
+            'erro_comunicacao' => $this->session->flashdata('candidato_comunicacao_erro')
         ]);
     }
 
@@ -127,8 +137,77 @@ class Candidatos extends CI_Controller
             'pode_gerenciar' => $this->controle_acesso
                 ->tem_permissao('candidatos.gerenciar'),
             'mensagem_gestao' => $this->session->flashdata('candidato_gestao_mensagem'),
-            'erro_gestao' => $this->session->flashdata('candidato_gestao_erro')
+            'erro_gestao' => $this->session->flashdata('candidato_gestao_erro'),
+            'modelos_mensagem' => $this->tem_permissao_comunicacao()
+                ? $this->candidato_comunicacao_model->listar_modelos_ativos()
+                : [],
+            'envios' => $this->candidato_comunicacao_model
+                ->listar_envios_por_candidato($candidato['codigo']),
+            'pode_comunicar' => $this->tem_permissao_comunicacao(),
+            'mensagem_comunicacao' => $this->session->flashdata('candidato_comunicacao_mensagem'),
+            'erro_comunicacao' => $this->session->flashdata('candidato_comunicacao_erro')
         ]);
+    }
+
+    public function enviar_mensagem($codigo = NULL)
+    {
+        $this->exigir_comunicacao();
+
+        if ($this->input->method() !== 'post' || !$this->codigo_valido($codigo)) {
+            show_404();
+        }
+
+        $modelo_codigo = (int) $this->input->post('modelo_codigo', TRUE);
+        $resultado = $this->enviar_modelo((int) $codigo, $modelo_codigo);
+        $chave = $resultado['sucesso']
+            ? 'candidato_comunicacao_mensagem'
+            : 'candidato_comunicacao_erro';
+        $this->session->set_flashdata($chave, $resultado['mensagem']);
+        redirect('candidatos/detalhe/' . (int) $codigo);
+    }
+
+    public function enviar_mensagem_lote()
+    {
+        $this->exigir_comunicacao();
+
+        if ($this->input->method() !== 'post') {
+            show_404();
+        }
+
+        $codigos = $this->input->post('candidatos', TRUE);
+        $modelo_codigo = (int) $this->input->post('modelo_codigo', TRUE);
+        $codigos = is_array($codigos) ? array_slice($codigos, 0, 100) : [];
+
+        if (empty($codigos)) {
+            $this->session->set_flashdata(
+                'candidato_comunicacao_erro',
+                'Selecione pelo menos um candidato.'
+            );
+            redirect('candidatos');
+            return;
+        }
+
+        $enviados = 0;
+        $falhas = 0;
+
+        foreach ($codigos as $codigo) {
+            if (!$this->codigo_valido((string) $codigo)) {
+                continue;
+            }
+
+            $resultado = $this->enviar_modelo((int) $codigo, $modelo_codigo);
+            $resultado['sucesso'] ? $enviados++ : $falhas++;
+        }
+
+        $mensagem = $enviados . ' mensagem(ns) enviada(s).';
+        if ($falhas > 0) {
+            $mensagem .= ' ' . $falhas . ' envio(s) falharam.';
+        }
+        $this->session->set_flashdata(
+            $falhas > 0 ? 'candidato_comunicacao_erro' : 'candidato_comunicacao_mensagem',
+            $mensagem
+        );
+        redirect('candidatos');
     }
 
     public function atualizar_situacao($codigo = NULL)
@@ -219,6 +298,69 @@ class Candidatos extends CI_Controller
     private function exigir_gerenciamento()
     {
         $this->controle_acesso->valida_permissao('candidatos.gerenciar');
+    }
+
+    private function exigir_comunicacao()
+    {
+        $this->controle_acesso->valida_permissao('candidatos.comunicar');
+    }
+
+    private function tem_permissao_comunicacao()
+    {
+        return $this->controle_acesso->tem_permissao('candidatos.comunicar');
+    }
+
+    private function enviar_modelo($codigo, $modelo_codigo)
+    {
+        $candidato = $this->candidato_model->buscar_por_codigo($codigo);
+        $modelo = $this->candidato_comunicacao_model->buscar_modelo($modelo_codigo, TRUE);
+
+        if (!$candidato || !$modelo) {
+            return ['sucesso' => FALSE, 'mensagem' => 'Candidato ou modelo inválido.'];
+        }
+
+        $situacoes = $this->candidato_historico_model->situacoes();
+        $assunto = $this->candidato_comunicacao_model->renderizar($modelo['assunto'], $candidato, $situacoes);
+        $conteudo = $this->candidato_comunicacao_model->renderizar($modelo['conteudo'], $candidato, $situacoes);
+        $erro = NULL;
+        $enviado = FALSE;
+        $remetente = getenv('VITAE_EMAIL_REMETENTE');
+
+        if (!$remetente || !filter_var($remetente, FILTER_VALIDATE_EMAIL) ||
+            !is_file(APPPATH . 'config/email.php')) {
+            $erro = 'Configure email.php e VITAE_EMAIL_REMETENTE.';
+        } else {
+            $this->load->library('email');
+            $this->email->clear(TRUE);
+            $this->email->from($remetente, 'Vitae RH');
+            $this->email->to($candidato['email']);
+            $this->email->subject($assunto);
+            $this->email->message($conteudo);
+            $enviado = $this->email->send();
+            if (!$enviado) {
+                $erro = 'O servidor de e-mail recusou o envio.';
+                log_message('error', 'Falha ao enviar mensagem para candidato ' . $codigo . '.');
+            }
+        }
+
+        $registrado = $this->candidato_comunicacao_model->registrar_envio([
+            'candidato_codigo' => $codigo,
+            'usuario_codigo' => $this->controle_acesso->get('codigo'),
+            'modelo_codigo' => $modelo['codigo'],
+            'destinatario' => $candidato['email'],
+            'assunto' => $assunto,
+            'conteudo' => $conteudo,
+            'status' => $enviado ? 'enviado' : 'erro',
+            'erro' => $erro,
+            'enviado_em' => $enviado ? date('Y-m-d H:i:s') : NULL
+        ]);
+
+        return [
+            'sucesso' => $enviado && $registrado,
+            'mensagem' => $enviado && $registrado
+                ? 'Mensagem enviada com sucesso.'
+                : ($erro ?: 'Não foi possível registrar o envio.')
+        ];
     }
 
     public function foto($codigo = NULL)

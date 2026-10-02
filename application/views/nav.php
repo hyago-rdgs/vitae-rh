@@ -58,6 +58,13 @@ $formulario_ativo = in_array(
                     </li>
                     <?php endif; ?>
 
+                    <?php if ($this->controle_acesso->tem_permissao('candidatos.comunicar')): ?>
+                    <li class="nav-item">
+                        <a class="nav-link <?= $modulo_atual == 'candidato_mensagens' ? 'active fw-semibold' : ''; ?>"
+                            href="<?= base_url('candidato_mensagens'); ?>">Mensagens</a>
+                    </li>
+                    <?php endif; ?>
+
                     <?php if ($this->controle_acesso->tem_permissao('formularios.gerenciar')): ?>
                     <li class="nav-item">
                         <a class="nav-link <?= $formulario_ativo ? 'active fw-semibold' : ''; ?>"
