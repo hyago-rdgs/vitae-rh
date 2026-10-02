@@ -36,6 +36,13 @@ class Candidatos extends CI_Controller
             'data_fim' => $this->obter_data('data_fim')
         ];
         $erros_filtro = [];
+        $campos_filtro = $this->candidato_comunicacao_model->campos_publicados();
+
+        if ($filtros['campo_chave'] !== '' && !array_key_exists($filtros['campo_chave'], $campos_filtro)) {
+            $filtros['campo_chave'] = '';
+            $filtros['valor_campo'] = '';
+            $erros_filtro[] = 'O campo configurável selecionado não está publicado.';
+        }
 
         if ($filtros['data_inicio'] === FALSE) {
             $filtros['data_inicio'] = '';
@@ -77,7 +84,7 @@ class Candidatos extends CI_Controller
             'pagina' => $pagina,
             'total_paginas' => $total_paginas,
             'situacoes_seletivas' => $this->candidato_historico_model->situacoes(),
-            'campos_filtro' => $this->candidato_comunicacao_model->campos_publicados(),
+            'campos_filtro' => $campos_filtro,
             'modelos_mensagem' => $this->tem_permissao_comunicacao()
                 ? $this->candidato_comunicacao_model->listar_modelos_ativos()
                 : [],
@@ -159,7 +166,7 @@ class Candidatos extends CI_Controller
 
         $modelo_codigo = (int) $this->input->post('modelo_codigo', TRUE);
         $resultado = $this->enviar_modelo((int) $codigo, $modelo_codigo);
-        $chave = $resultado['sucesso']
+        $chave = $resultado['sucesso'] && empty($resultado['aviso'])
             ? 'candidato_comunicacao_mensagem'
             : 'candidato_comunicacao_erro';
         $this->session->set_flashdata($chave, $resultado['mensagem']);
@@ -177,6 +184,9 @@ class Candidatos extends CI_Controller
         $codigos = $this->input->post('candidatos', TRUE);
         $modelo_codigo = (int) $this->input->post('modelo_codigo', TRUE);
         $codigos = is_array($codigos) ? array_slice($codigos, 0, 100) : [];
+        $codigos = array_values(array_unique(array_filter($codigos, function ($codigo) {
+            return is_string($codigo) && $this->codigo_valido($codigo);
+        })));
 
         if (empty($codigos)) {
             $this->session->set_flashdata(
@@ -189,22 +199,26 @@ class Candidatos extends CI_Controller
 
         $enviados = 0;
         $falhas = 0;
+        $sem_historico = 0;
 
         foreach ($codigos as $codigo) {
-            if (!$this->codigo_valido((string) $codigo)) {
-                continue;
-            }
-
             $resultado = $this->enviar_modelo((int) $codigo, $modelo_codigo);
             $resultado['sucesso'] ? $enviados++ : $falhas++;
+            if (!empty($resultado['aviso'])) {
+                $sem_historico++;
+            }
         }
 
         $mensagem = $enviados . ' mensagem(ns) enviada(s).';
         if ($falhas > 0) {
             $mensagem .= ' ' . $falhas . ' envio(s) falharam.';
         }
+        if ($sem_historico > 0) {
+            $mensagem .= ' ' . $sem_historico . ' envio(s) sem registro no histórico.';
+        }
         $this->session->set_flashdata(
-            $falhas > 0 ? 'candidato_comunicacao_erro' : 'candidato_comunicacao_mensagem',
+            $falhas > 0 || $sem_historico > 0
+                ? 'candidato_comunicacao_erro' : 'candidato_comunicacao_mensagem',
             $mensagem
         );
         redirect('candidatos');
@@ -355,11 +369,16 @@ class Candidatos extends CI_Controller
             'enviado_em' => $enviado ? date('Y-m-d H:i:s') : NULL
         ]);
 
+        if (!$registrado) {
+            log_message('error', 'Falha ao registrar envio de mensagem para candidato ' . $codigo . '.');
+        }
+
         return [
-            'sucesso' => $enviado && $registrado,
-            'mensagem' => $enviado && $registrado
-                ? 'Mensagem enviada com sucesso.'
-                : ($erro ?: 'Não foi possível registrar o envio.')
+            'sucesso' => $enviado,
+            'aviso' => $enviado && !$registrado,
+            'mensagem' => $enviado
+                ? ($registrado ? 'Mensagem enviada com sucesso.' : 'Mensagem enviada, mas o histórico não pôde ser registrado.')
+                : ($erro ?: 'Não foi possível enviar a mensagem.')
         ];
     }
 

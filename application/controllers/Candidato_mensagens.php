@@ -13,6 +13,10 @@ class Candidato_mensagens extends CI_Controller
 
     public function index()
     {
+        if ($this->input->method() !== 'get') {
+            show_404();
+        }
+
         $this->load->view('candidatos/mensagens_lista', [
             'modelos' => $this->candidato_comunicacao_model->listar_modelos()
         ]);
@@ -20,6 +24,11 @@ class Candidato_mensagens extends CI_Controller
 
     public function cadastrar($codigo = NULL)
     {
+        if ($this->input->method() !== 'get' ||
+            ($codigo !== NULL && (!ctype_digit((string) $codigo) || (int) $codigo < 1))) {
+            show_404();
+        }
+
         $modelo = $codigo !== NULL
             ? $this->candidato_comunicacao_model->buscar_modelo((int) $codigo)
             : NULL;
@@ -44,9 +53,14 @@ class Candidato_mensagens extends CI_Controller
         }
 
         $post = $this->input->post(NULL, TRUE);
-        $nome = trim((string) ($post['nome'] ?? ''));
-        $assunto = trim((string) ($post['assunto'] ?? ''));
-        $conteudo = trim((string) ($post['conteudo'] ?? ''));
+        if ($codigo !== NULL && (!ctype_digit((string) $codigo) || (int) $codigo < 1 ||
+            !$this->candidato_comunicacao_model->buscar_modelo((int) $codigo))) {
+            show_404();
+        }
+
+        $nome = is_string($post['nome'] ?? NULL) ? trim($post['nome']) : '';
+        $assunto = is_string($post['assunto'] ?? NULL) ? trim($post['assunto']) : '';
+        $conteudo = is_string($post['conteudo'] ?? NULL) ? trim($post['conteudo']) : '';
         $ativo = isset($post['ativo']) ? 1 : 0;
         $erros = [];
 
@@ -84,7 +98,9 @@ class Candidato_mensagens extends CI_Controller
 
     public function excluir($codigo = NULL)
     {
-        if ($this->input->method() !== 'post' || !$codigo) {
+        if ($this->input->method() !== 'post' || !ctype_digit((string) $codigo) ||
+            (int) $codigo < 1 ||
+            !$this->candidato_comunicacao_model->buscar_modelo((int) $codigo)) {
             show_404();
         }
 
