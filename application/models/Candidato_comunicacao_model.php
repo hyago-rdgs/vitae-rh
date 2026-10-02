@@ -99,7 +99,7 @@ class Candidato_comunicacao_model extends CI_Model
         $publicacao = $this->formulario_publicacao_model
             ->buscar_atual($formulario['codigo']);
         $estrutura = $publicacao
-            ? json_decode($publicacao['estrutura'], TRUE)
+            ? json_decode($publicacao['estrutura'] ?? '', TRUE)
             : [];
         $campos = [];
 

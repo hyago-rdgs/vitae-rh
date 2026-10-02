@@ -40,6 +40,7 @@ class Formulario_publicacao_model extends CI_Model
             'p.codigo',
             'p.formulario_codigo',
             'p.versao',
+            'p.estrutura',
             'p.observacao',
             'p.usuario_codigo',
             'p.cadastro',
