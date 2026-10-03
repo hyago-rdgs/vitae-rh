@@ -116,14 +116,14 @@
                 <div class="card-body">
                     <form method="post" action="<?= base_url('candidatos/enviar-mensagem/' . (int) $candidato['codigo']); ?>" class="row g-3 align-items-end">
                         <input type="hidden" name="_token_admin" value="<?= html_escape($this->token_admin->obter()); ?>">
-                        <div class="col-12 col-md-8"><label class="form-label" for="modelo_codigo">Modelo</label>
+                        <div class="col-12 col-md-9"><label class="form-label" for="modelo_codigo">Modelo</label>
                             <select class="form-select" id="modelo_codigo" name="modelo_codigo" required><option value="">Selecione um modelo</option>
                                 <?php foreach ($modelos_mensagem as $modelo): ?><option value="<?= (int) $modelo['codigo']; ?>"><?= html_escape($modelo['nome']); ?></option><?php endforeach; ?>
                             </select>
                         </div>
-                        <div class="col-12 col-md-4 d-grid gap-2">
-                            <button class="btn btn-success" type="submit" name="canal" value="email">Enviar por e-mail</button>
-                            <button class="btn btn-outline-success" type="submit" name="canal" value="whatsapp" formtarget="_blank">Abrir no WhatsApp</button>
+                        <div class="col-12 col-md-3 d-flex gap-2">
+                            <button class="btn btn-success w-50" type="submit" name="canal" value="email">Enviar por e-mail</button>
+                            <button class="btn btn-outline-success w-50" type="submit" name="canal" value="whatsapp" formtarget="_blank">Abrir no WhatsApp</button>
                         </div>
                     </form>
                 </div>

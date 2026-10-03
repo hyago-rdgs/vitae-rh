@@ -71,6 +71,8 @@
                                             <i class="fa-solid fa-eye" aria-hidden="true"></i>
                                         </button>
                                     </div>
+
+                                    <a href="<?= base_url('recuperacao_usuario'); ?>">Esqueci minha senha</a>
                                 </div>
 
                                 <button class="btn btn-success w-100" type="submit" id="entrar">
@@ -78,8 +80,7 @@
                                     Entrar
                                 </button>
                             </form>
-                            <div class="d-grid gap-2 mt-3">
-                                <a href="<?= base_url('recuperacao_usuario'); ?>">Esqueci minha senha</a>
+                            <div class="d-grid gap-2 mt-2">
                                 <a class="btn btn-outline-secondary" href="<?= base_url('candidato/login'); ?>">Sou candidato</a>
                             </div>
 

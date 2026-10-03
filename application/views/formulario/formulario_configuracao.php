@@ -46,15 +46,6 @@
             </div>
         </header>
 
-        <section class="alert alert-light border shadow-sm mb-4" aria-labelledby="estrutura-title">
-            <h2 class="h6 fw-semibold mb-2" id="estrutura-title">Como o perfil é organizado</h2>
-            <p class="small text-secondary mb-0">
-                <strong>Seções</strong> dividem o formulário em etapas e
-                <strong>campos</strong> são as perguntas respondidas pelo candidato.
-                Use grupos apenas quando precisar reunir ou repetir um conjunto de informações.
-            </p>
-        </section>
-
         <section class="card border shadow-sm mb-4" aria-labelledby="publicacao-title">
             <div class="card-body p-4">
                 <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
@@ -442,6 +433,7 @@
                                 <th scope="col">Data</th>
                                 <th scope="col">Responsável</th>
                                 <th scope="col">Observação</th>
+                                <th class="text-end" scope="col">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -461,6 +453,8 @@
                                     </td>
                                     <td>
                                         <?= html_escape($publicacao['observacao'] ?? '—'); ?>
+                                    </td>
+                                    <td class="float-end">
                                         <?php if ($pode_publicar): ?>
                                             <div class="d-flex gap-2 mt-2">
                                                 <form method="post" action="<?= base_url('formulario_publicacao/ativar/' . (int) $publicacao['codigo']); ?>">
