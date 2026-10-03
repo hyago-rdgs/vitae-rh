@@ -1,7 +1,8 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-// Configuração local do transporte para os links de recuperação do candidato.
+// Configuração local lida pela biblioteca Correio (PHPMailer via Composer).
+// Usada pelas mensagens e recuperações de senha do candidato e do administrador.
 // Copie para email.php e ajuste conforme o servidor de e-mail da empresa.
 $config['protocol'] = 'smtp';
 $config['smtp_host'] = 'smtp.exemplo.com';

@@ -24,7 +24,8 @@
             </section>
 
             <div class="d-flex flex-wrap gap-2">
-                <a class="btn btn-light border" href="<?= base_url('formulario/previsualizar'); ?>">
+                <a class="btn btn-light border" href="<?= base_url('formulario'); ?>">Todos os formulários</a>
+                <a class="btn btn-light border" href="<?= base_url('formulario/previsualizar/' . (int) $formulario['codigo']); ?>">
                     <i class="fa-solid fa-eye me-2" aria-hidden="true"></i>
                     Pré-visualizar
                 </a>
@@ -82,13 +83,13 @@
                             </p>
                         <?php else: ?>
                             <p class="small text-secondary mb-0">
-                                O formulário ainda está somente como rascunho.
+                                Este formulário não possui uma versão vigente.
                             </p>
                         <?php endif; ?>
                     </div>
 
                     <p class="small text-secondary mb-0 align-self-md-center">
-                        Alterações no rascunho não afetam a versão vigente até uma nova publicação.
+                        Após publicar, use Tornar vigente para disponibilizar a versão aos candidatos.
                     </p>
                 </div>
             </div>
@@ -101,7 +102,7 @@
                 <div class="card-body p-4">
                     <h2 class="h5 fw-semibold mb-1" id="configuracao-geral-title">Informações gerais</h2>
                     <p class="small text-secondary mb-4">
-                        Identifique a estrutura global utilizada no perfil dos candidatos.
+                        Identifique este formulário de perfil dos candidatos.
                     </p>
 
                     <div class="row g-3">
@@ -447,8 +448,8 @@
                             <?php foreach ($publicacoes as $indice_publicacao => $publicacao): ?>
                                 <tr>
                                     <td>
-                                        <span class="fw-semibold">v<?= (int) $publicacao['versao']; ?></span>
-                                        <?php if ($indice_publicacao === 0): ?>
+                                        <a class="fw-semibold" href="<?= base_url('formulario/versao/' . (int) $publicacao['codigo']); ?>">v<?= (int) $publicacao['versao']; ?></a>
+                                        <?php if ($publicacao_atual && (int) $publicacao_atual['codigo'] === (int) $publicacao['codigo']): ?>
                                             <span class="badge text-bg-success ms-1">Vigente</span>
                                         <?php endif; ?>
                                     </td>
@@ -460,6 +461,18 @@
                                     </td>
                                     <td>
                                         <?= html_escape($publicacao['observacao'] ?? '—'); ?>
+                                        <?php if ($pode_publicar): ?>
+                                            <div class="d-flex gap-2 mt-2">
+                                                <form method="post" action="<?= base_url('formulario_publicacao/ativar/' . (int) $publicacao['codigo']); ?>">
+                                                    <input type="hidden" name="_token_admin" value="<?= html_escape($this->token_admin->obter()); ?>">
+                                                    <button class="btn btn-sm btn-outline-success">Tornar vigente</button>
+                                                </form>
+                                                <form method="post" action="<?= base_url('formulario_publicacao/excluir/' . (int) $publicacao['codigo']); ?>">
+                                                    <input type="hidden" name="_token_admin" value="<?= html_escape($this->token_admin->obter()); ?>">
+                                                    <button class="btn btn-sm btn-outline-danger">Excluir publicação</button>
+                                                </form>
+                                            </div>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -493,7 +506,7 @@
 
                             <p>
                                 Será criada a versão
-                                <strong><?= (int) ($publicacao_atual['versao'] ?? 0) + 1; ?></strong>
+                                <strong><?= (int) $proxima_versao; ?></strong>
                                 com a estrutura atual do rascunho.
                             </p>
 
@@ -1207,7 +1220,7 @@
                 $.ajax({
                     url: window.location.href,
                     method: 'POST',
-                    data: $(this).serialize(),
+                    data: $(this).serialize() + '&_token_admin=<?= html_escape($this->token_admin->obter()); ?>&formulario_codigo=<?= (int) $formulario['codigo']; ?>',
                     dataType: 'json'
                 }).done(function (response) {
                     mostrar_feedback(
@@ -1239,7 +1252,7 @@
                 $.ajax({
                     url: base_url + 'formulario_publicacao/publicar',
                     method: 'POST',
-                    data: $(this).serialize(),
+                    data: $(this).serialize() + '&_token_admin=<?= html_escape($this->token_admin->obter()); ?>&formulario_codigo=<?= (int) $formulario['codigo']; ?>',
                     dataType: 'json'
                 }).done(function () {
                     bootstrap.Modal
@@ -1277,7 +1290,7 @@
                 $.ajax({
                     url: url,
                     method: 'POST',
-                    data: $(this).serialize(),
+                    data: $(this).serialize() + '&_token_admin=<?= html_escape($this->token_admin->obter()); ?>&formulario_codigo=<?= (int) $formulario['codigo']; ?>',
                     dataType: 'json'
                 }).done(function () {
                     bootstrap.Modal
@@ -1386,7 +1399,7 @@
                 $.ajax({
                     url: url,
                     method: 'POST',
-                    data: $(this).serialize(),
+                    data: $(this).serialize() + '&_token_admin=<?= html_escape($this->token_admin->obter()); ?>&formulario_codigo=<?= (int) $formulario['codigo']; ?>',
                     dataType: 'json'
                 }).done(function () {
                     bootstrap.Modal
@@ -1495,7 +1508,7 @@
                 $.ajax({
                     url: url,
                     method: 'POST',
-                    data: $(this).serialize(),
+                    data: $(this).serialize() + '&_token_admin=<?= html_escape($this->token_admin->obter()); ?>&formulario_codigo=<?= (int) $formulario['codigo']; ?>',
                     dataType: 'json'
                 }).done(function () {
                     bootstrap.Modal

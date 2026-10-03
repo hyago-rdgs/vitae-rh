@@ -50,7 +50,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |		my-controller/my-method	-> my_controller/my_method
 */
 
-$route['default_controller'] = 'principal';
+$route['default_controller'] = 'portal_candidato/login';
 $route['candidatos'] = 'candidatos/index';
 $route['candidatos/detalhe/(:num)'] = 'candidatos/detalhe/$1';
 $route['candidatos/situacao/(:num)'] = 'candidatos/atualizar_situacao/$1';
@@ -58,7 +58,6 @@ $route['candidatos/anotacao/(:num)'] = 'candidatos/adicionar_anotacao/$1';
 $route['candidatos/foto/(:num)'] = 'candidatos/foto/$1';
 $route['candidatos/curriculo/(:num)'] = 'candidatos/curriculo/$1';
 $route['candidatos/enviar-mensagem/(:num)'] = 'candidatos/enviar_mensagem/$1';
-$route['candidatos/enviar-mensagem-lote'] = 'candidatos/enviar_mensagem_lote';
 $route['candidato_mensagens'] = 'candidato_mensagens/index';
 $route['candidato_mensagens/cadastrar'] = 'candidato_mensagens/cadastrar';
 $route['candidato_mensagens/cadastrar/(:num)'] = 'candidato_mensagens/cadastrar/$1';

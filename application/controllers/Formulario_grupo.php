@@ -360,7 +360,7 @@ class Formulario_grupo extends CI_Controller
         $secao = $this->formulario_secao_model->buscar_por_codigo(
             (int) $codigo
         );
-        $formulario = $this->formulario_model->buscar();
+        $formulario = $this->formulario_model->buscar($secao['formulario_codigo'] ?? 0);
 
         if (
             !$secao ||
@@ -393,7 +393,7 @@ class Formulario_grupo extends CI_Controller
         $grupo = $this->formulario_grupo_model->buscar_por_codigo(
             (int) $codigo
         );
-        $formulario = $this->formulario_model->buscar();
+        $formulario = $this->formulario_model->buscar($grupo['formulario_codigo'] ?? 0);
 
         if (
             !$grupo ||

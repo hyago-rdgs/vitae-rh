@@ -385,7 +385,7 @@ class Formulario_campo extends CI_Controller
         $grupo = $this->formulario_grupo_model->buscar_por_codigo(
             (int) $codigo
         );
-        $formulario = $this->formulario_model->buscar();
+        $formulario = $this->formulario_model->buscar($grupo['formulario_codigo'] ?? 0);
 
         if (
             !$grupo ||
@@ -418,7 +418,7 @@ class Formulario_campo extends CI_Controller
         $campo = $this->formulario_campo_model->buscar_por_codigo(
             (int) $codigo
         );
-        $formulario = $this->formulario_model->buscar();
+        $formulario = $this->formulario_model->buscar($campo['formulario_codigo'] ?? 0);
 
         if (
             !$campo ||

@@ -12,6 +12,7 @@ class Formulario_publicacao extends CI_Controller
         );
 
         $this->load->library('auditoria');
+        $this->load->library('token_admin');
         $this->load->database();
         $this->load->model('formulario_model');
         $this->load->model('formulario_secao_model');
@@ -27,7 +28,8 @@ class Formulario_publicacao extends CI_Controller
             show_404();
         }
 
-        $formulario = $this->formulario_model->buscar();
+        $formulario = $this->formulario_model->buscar($this->input->post('formulario_codigo'));
+        $this->token_admin->exigir();
 
         if (!$formulario) {
             resposta_json(
@@ -172,6 +174,29 @@ class Formulario_publicacao extends CI_Controller
             ],
             201
         );
+    }
+
+    public function ativar($codigo = NULL)
+    {
+        $this->alterar_vigencia($codigo, FALSE);
+    }
+
+    public function excluir($codigo = NULL)
+    {
+        $this->alterar_vigencia($codigo, TRUE);
+    }
+
+    private function alterar_vigencia($codigo, $excluir)
+    {
+        if ($this->input->method() !== 'post' || !ctype_digit((string) $codigo)) show_404();
+        $this->token_admin->exigir();
+        $publicacao = $this->formulario_publicacao_model->buscar_por_codigo((int) $codigo);
+        if (!$publicacao || !$this->formulario_publicacao_model->gerenciar((int) $codigo, $excluir)) {
+            show_error('Não foi possível alterar a publicação.', 422);
+        }
+        $this->auditoria->registrar('formularios', $excluir ? 'PUBLICACAO_EXCLUIDA' : 'PUBLICACAO_ATIVADA',
+            'formulario_publicacoes', $codigo, NULL, ['versao' => $publicacao['versao']]);
+        redirect('formulario/configurar/' . $publicacao['formulario_codigo']);
     }
 
     private function preparar_estrutura($formulario)

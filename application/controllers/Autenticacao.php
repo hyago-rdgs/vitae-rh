@@ -19,7 +19,7 @@ class Autenticacao extends CI_Controller
     public function login()
     {
         if ($this->controle_acesso->logado()) {
-            redirect(base_url());
+            redirect('principal');
             return;
         }
 

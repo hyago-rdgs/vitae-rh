@@ -86,37 +86,6 @@ class Candidato_comunicacao_model extends CI_Model
         return $this->db->get()->result_array();
     }
 
-    public function campos_publicados()
-    {
-        $this->load->model('formulario_model');
-        $this->load->model('formulario_publicacao_model');
-        $formulario = $this->formulario_model->buscar();
-
-        if (!$formulario) {
-            return [];
-        }
-
-        $publicacao = $this->formulario_publicacao_model
-            ->buscar_atual($formulario['codigo']);
-        $estrutura = $publicacao
-            ? json_decode($publicacao['estrutura'] ?? '', TRUE)
-            : [];
-        $campos = [];
-
-        foreach (($estrutura['secoes'] ?? []) as $secao) {
-            foreach (($secao['grupos'] ?? []) as $grupo) {
-                foreach (($grupo['campos'] ?? []) as $campo) {
-                    if (!empty($campo['chave'])) {
-                        $campos[$campo['chave']] = $campo['nome'];
-                    }
-                }
-            }
-        }
-
-        asort($campos, SORT_NATURAL | SORT_FLAG_CASE);
-        return $campos;
-    }
-
     public function renderizar($texto, $candidato, $situacoes)
     {
         $variaveis = [

@@ -27,15 +27,15 @@
         <header class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-4">
             <section>
                 <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
-                    <h1 class="h3 mb-0">Pré-visualização do formulário</h1>
-                    <span class="badge text-bg-warning">Rascunho</span>
+                    <h1 class="h3 mb-0"><?= html_escape($formulario['nome']); ?></h1>
+                    <span class="badge text-bg-warning"><?= isset($versao) ? 'Versão ' . (int) $versao : 'Rascunho'; ?></span>
                 </div>
                 <p class="text-body-secondary mb-0">
                     Visualização aproximada do cadastro que será apresentado ao candidato.
                 </p>
             </section>
 
-            <a class="btn btn-light border" href="<?= base_url('formulario'); ?>">
+            <a class="btn btn-light border" href="<?= base_url('formulario/configurar/' . (int) $formulario['codigo']); ?>">
                 <i class="fa-solid fa-arrow-left me-2" aria-hidden="true"></i>
                 Voltar à configuração
             </a>

@@ -17,6 +17,12 @@
         </nav>
     </header>
     <main class="container py-4 py-lg-5">
+        <?php if ($nova_publicacao && (int) $nova_publicacao['codigo'] !== (int) $formulario['formulario_publicacao_codigo']): ?>
+            <div class="alert alert-info" role="status">
+                O formulário principal mudou. Há informações que você pode preencher ou revisar.
+                <a href="<?= base_url('candidato/portal/editar'); ?>" class="alert-link">Atualizar meu perfil</a>
+            </div>
+        <?php endif; ?>
         <?php if ($salvo): ?>
             <div class="alert alert-success" role="status">Seu perfil foi atualizado.</div>
         <?php endif; ?>

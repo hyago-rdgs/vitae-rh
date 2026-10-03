@@ -20,6 +20,7 @@ class Portal_candidato extends Candidato
 
         $erro = '';
         $email = '';
+        $mostrar_senha = FALSE;
 
         if ($this->input->method() === 'post') {
             $post = $this->input->post(NULL, FALSE);
@@ -29,11 +30,20 @@ class Portal_candidato extends Candidato
 
             if (!$this->validar_token($post, 'login')) {
                 $erro = 'A sessão expirou. Atualize a página e tente novamente.';
+            } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 150) {
+                $erro = 'Informe um e-mail válido.';
             } else {
                 $candidato = $this->candidato_model->buscar_para_autenticacao($email);
 
-                if (!$candidato || !password_verify($senha, $candidato['senha'])) {
-                    $erro = 'E-mail ou senha inválidos.';
+                $mostrar_senha = (bool) $candidato;
+                if (!$candidato) {
+                    $erro = $this->candidato_model->email_em_uso($email)
+                        ? 'Esse cadastro está indisponível. Entre em contato com o RH.'
+                        : 'Não encontramos um cadastro com esse e-mail. Clique em Criar perfil para se cadastrar.';
+                } elseif (!isset($post['senha'])) {
+                    $mostrar_senha = TRUE;
+                } elseif (!password_verify($senha, $candidato['senha'])) {
+                    $erro = 'Senha inválida.';
                 } else {
                     $this->controle_candidato->criar($candidato);
                     $this->candidato_model->atualizar_ultimo_acesso($candidato['codigo']);
@@ -47,6 +57,7 @@ class Portal_candidato extends Candidato
 
         $this->load->view('candidato/acesso', [
             'pagina' => 'login', 'erro' => $erro, 'email' => $email,
+            'mostrar_senha' => $mostrar_senha,
             'token' => $this->novo_token('login')
         ]);
     }
@@ -184,6 +195,7 @@ class Portal_candidato extends Candidato
             'estrutura' => $estrutura,
             'respostas' => $this->valores_salvos($formulario['codigo']),
             'token_logout' => $this->novo_token('logout'),
+            'nova_publicacao' => $this->formulario_publicacao_model->buscar_vigente(),
             'salvo' => $this->session->flashdata('candidato_perfil_salvo')
         ]);
     }
@@ -366,6 +378,10 @@ class Portal_candidato extends Candidato
     private function salvar_edicao($candidato, $formulario, $dados, $respostas, $arquivos, $publicacao)
     {
         if (!$this->db->trans_begin()) return FALSE;
+        if (!$this->formulario_publicacao_model->conferir_vigente($publicacao['codigo'])) {
+            $this->db->trans_rollback();
+            return FALSE;
+        }
 
         // Bloqueia edições simultâneas do mesmo perfil até o fim da transação.
         $bloqueado = $this->db->query(
@@ -456,27 +472,12 @@ class Portal_candidato extends Candidato
 
     private function enviar_recuperacao($destinatario, $token)
     {
-        $remetente = getenv('VITAE_EMAIL_REMETENTE');
-
-        if (!$remetente || !filter_var($remetente, FILTER_VALIDATE_EMAIL) ||
-            !is_file(APPPATH . 'config/email.php')) {
-            log_message('error', 'Configure email.php e VITAE_EMAIL_REMETENTE para a recuperação.');
-            return;
-        }
-
-        $this->load->library('email');
-        $link = base_url('candidato/redefinir/' . $token);
-        $this->email->from($remetente, 'Vitae RH');
-        $this->email->to($destinatario);
-        $this->email->subject('Redefinição de senha - Vitae RH');
-        $this->email->message(
-            "Recebemos um pedido de redefinição de senha.\n\n" .
-            "Acesse o link em até 1 hora: " . $link . "\n\n" .
-            "Se não foi você, ignore esta mensagem."
+        $this->load->library('correio');
+        $this->correio->enviar(
+            $destinatario,
+            'Redefinição de senha - Vitae RH',
+            "Acesse o link em até 1 hora: " . base_url('candidato/redefinir/' . $token) .
+            "\n\nSe não foi você, ignore esta mensagem."
         );
-
-        if (!$this->email->send()) {
-            log_message('error', 'Falha ao enviar recuperação de senha do candidato.');
-        }
     }
 }

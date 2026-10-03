@@ -24,7 +24,7 @@ class Formulario_secao extends CI_Controller
             show_404();
         }
 
-        $formulario = $this->formulario_model->buscar();
+        $formulario = $this->formulario_model->buscar($this->input->post('formulario_codigo'));
 
         if (!$formulario) {
             resposta_json(

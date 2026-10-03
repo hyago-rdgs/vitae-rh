@@ -11,7 +11,19 @@ class Formulario_model extends CI_Model
         $this->load->database();
     }
 
-    public function buscar()
+    public function listar()
+    {
+        return $this->db->where('exclusao IS NULL', NULL, FALSE)
+            ->order_by('nome')->get($this->tabela)->result_array();
+    }
+
+    public function cadastrar($dados)
+    {
+        $dados['chave'] = 'form_' . bin2hex(random_bytes(12));
+        return $this->db->insert($this->tabela, $dados) ? $this->db->insert_id() : FALSE;
+    }
+
+    public function buscar($codigo = NULL)
     {
         $this->db->select([
             'codigo',
@@ -21,8 +33,9 @@ class Formulario_model extends CI_Model
             'cadastro',
             'atualizacao'
         ]);
-        $this->db->where('chave', 'perfil_candidato');
+        if ($codigo !== NULL) $this->db->where('codigo', (int) $codigo);
         $this->db->where('exclusao IS NULL', NULL, FALSE);
+        $this->db->order_by('codigo', 'ASC');
 
         return $this->db->get($this->tabela, 1)->row_array();
     }

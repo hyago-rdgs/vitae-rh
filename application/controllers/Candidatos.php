@@ -12,7 +12,9 @@ class Candidatos extends CI_Controller
         $this->controle_acesso->valida_permissao('candidatos.consultar');
         $this->load->database();
         $this->load->helper('download');
+        $this->load->library('token_admin');
         $this->load->model('candidato_model');
+        $this->load->model('candidato_filtro_model');
         $this->load->model('candidato_formulario_model');
         $this->load->model('candidato_resposta_model');
         $this->load->model('formulario_publicacao_model');
@@ -30,19 +32,14 @@ class Candidatos extends CI_Controller
             'termo' => $this->obter_filtro_texto('termo', 100),
             'status' => $this->obter_status(),
             'situacao_seletiva' => $this->obter_situacao_seletiva(),
-            'campo_chave' => $this->obter_filtro_texto('campo_chave', 100),
-            'valor_campo' => $this->obter_filtro_texto('valor_campo', 150),
             'data_inicio' => $this->obter_data('data_inicio'),
             'data_fim' => $this->obter_data('data_fim')
         ];
         $erros_filtro = [];
-        $campos_filtro = $this->candidato_comunicacao_model->campos_publicados();
-
-        if ($filtros['campo_chave'] !== '' && !array_key_exists($filtros['campo_chave'], $campos_filtro)) {
-            $filtros['campo_chave'] = '';
-            $filtros['valor_campo'] = '';
-            $erros_filtro[] = 'O campo configurável selecionado não está publicado.';
-        }
+        $campos_filtro = $this->candidato_filtro_model->campos();
+        $filtros['campos'] = $this->candidato_filtro_model->validar(
+            $this->input->get('campos'), $campos_filtro, $erros_filtro
+        );
 
         if ($filtros['data_inicio'] === FALSE) {
             $filtros['data_inicio'] = '';
@@ -85,10 +82,6 @@ class Candidatos extends CI_Controller
             'total_paginas' => $total_paginas,
             'situacoes_seletivas' => $this->candidato_historico_model->situacoes(),
             'campos_filtro' => $campos_filtro,
-            'modelos_mensagem' => $this->tem_permissao_comunicacao()
-                ? $this->candidato_comunicacao_model->listar_modelos_ativos()
-                : [],
-            'pode_comunicar' => $this->tem_permissao_comunicacao(),
             'mensagem_comunicacao' => $this->session->flashdata('candidato_comunicacao_mensagem'),
             'erro_comunicacao' => $this->session->flashdata('candidato_comunicacao_erro')
         ]);
@@ -148,8 +141,6 @@ class Candidatos extends CI_Controller
             'modelos_mensagem' => $this->tem_permissao_comunicacao()
                 ? $this->candidato_comunicacao_model->listar_modelos_ativos()
                 : [],
-            'envios' => $this->candidato_comunicacao_model
-                ->listar_envios_por_candidato($candidato['codigo']),
             'pode_comunicar' => $this->tem_permissao_comunicacao(),
             'mensagem_comunicacao' => $this->session->flashdata('candidato_comunicacao_mensagem'),
             'erro_comunicacao' => $this->session->flashdata('candidato_comunicacao_erro')
@@ -163,65 +154,32 @@ class Candidatos extends CI_Controller
         if ($this->input->method() !== 'post' || !$this->codigo_valido($codigo)) {
             show_404();
         }
+        $this->token_admin->exigir();
 
         $modelo_codigo = (int) $this->input->post('modelo_codigo', TRUE);
+        if ($this->input->post('canal') === 'whatsapp') {
+            $candidato = $this->candidato_model->buscar_por_codigo((int) $codigo);
+            $modelo = $this->candidato_comunicacao_model->buscar_modelo($modelo_codigo, TRUE);
+            if (!$candidato || !$modelo) show_404();
+            $telefone = preg_replace('/[^0-9]/', '', $candidato['telefone']);
+            if (strlen($telefone) === 10 || strlen($telefone) === 11) $telefone = '55' . $telefone;
+            if (!preg_match('/^[1-9][0-9]{10,14}$/D', $telefone)) {
+                $this->session->set_flashdata('candidato_comunicacao_erro', 'Revise o telefone com DDD e código do país.');
+                redirect('candidatos/detalhe/' . (int) $codigo);
+                return;
+            }
+            $texto = $this->candidato_comunicacao_model->renderizar(
+                $modelo['conteudo'], $candidato, $this->candidato_historico_model->situacoes()
+            );
+            redirect('https://wa.me/' . $telefone . '?text=' . rawurlencode($texto), 'location', 303);
+            return;
+        }
         $resultado = $this->enviar_modelo((int) $codigo, $modelo_codigo);
         $chave = $resultado['sucesso'] && empty($resultado['aviso'])
             ? 'candidato_comunicacao_mensagem'
             : 'candidato_comunicacao_erro';
         $this->session->set_flashdata($chave, $resultado['mensagem']);
         redirect('candidatos/detalhe/' . (int) $codigo);
-    }
-
-    public function enviar_mensagem_lote()
-    {
-        $this->exigir_comunicacao();
-
-        if ($this->input->method() !== 'post') {
-            show_404();
-        }
-
-        $codigos = $this->input->post('candidatos', TRUE);
-        $modelo_codigo = (int) $this->input->post('modelo_codigo', TRUE);
-        $codigos = is_array($codigos) ? array_slice($codigos, 0, 100) : [];
-        $codigos = array_values(array_unique(array_filter($codigos, function ($codigo) {
-            return is_string($codigo) && $this->codigo_valido($codigo);
-        })));
-
-        if (empty($codigos)) {
-            $this->session->set_flashdata(
-                'candidato_comunicacao_erro',
-                'Selecione pelo menos um candidato.'
-            );
-            redirect('candidatos');
-            return;
-        }
-
-        $enviados = 0;
-        $falhas = 0;
-        $sem_historico = 0;
-
-        foreach ($codigos as $codigo) {
-            $resultado = $this->enviar_modelo((int) $codigo, $modelo_codigo);
-            $resultado['sucesso'] ? $enviados++ : $falhas++;
-            if (!empty($resultado['aviso'])) {
-                $sem_historico++;
-            }
-        }
-
-        $mensagem = $enviados . ' mensagem(ns) enviada(s).';
-        if ($falhas > 0) {
-            $mensagem .= ' ' . $falhas . ' envio(s) falharam.';
-        }
-        if ($sem_historico > 0) {
-            $mensagem .= ' ' . $sem_historico . ' envio(s) sem registro no histórico.';
-        }
-        $this->session->set_flashdata(
-            $falhas > 0 || $sem_historico > 0
-                ? 'candidato_comunicacao_erro' : 'candidato_comunicacao_mensagem',
-            $mensagem
-        );
-        redirect('candidatos');
     }
 
     public function atualizar_situacao($codigo = NULL)
@@ -338,24 +296,9 @@ class Candidatos extends CI_Controller
         $conteudo = $this->candidato_comunicacao_model->renderizar($modelo['conteudo'], $candidato, $situacoes);
         $erro = NULL;
         $enviado = FALSE;
-        $remetente = getenv('VITAE_EMAIL_REMETENTE');
-
-        if (!$remetente || !filter_var($remetente, FILTER_VALIDATE_EMAIL) ||
-            !is_file(APPPATH . 'config/email.php')) {
-            $erro = 'Configure email.php e VITAE_EMAIL_REMETENTE.';
-        } else {
-            $this->load->library('email');
-            $this->email->clear(TRUE);
-            $this->email->from($remetente, 'Vitae RH');
-            $this->email->to($candidato['email']);
-            $this->email->subject($assunto);
-            $this->email->message($conteudo);
-            $enviado = $this->email->send();
-            if (!$enviado) {
-                $erro = 'O servidor de e-mail recusou o envio.';
-                log_message('error', 'Falha ao enviar mensagem para candidato ' . $codigo . '.');
-            }
-        }
+        $this->load->library('correio');
+        $enviado = $this->correio->enviar($candidato['email'], $assunto, $conteudo);
+        if (!$enviado) $erro = 'Não foi possível enviar. Verifique PHPMailer e a configuração SMTP.';
 
         $registrado = $this->candidato_comunicacao_model->registrar_envio([
             'candidato_codigo' => $codigo,

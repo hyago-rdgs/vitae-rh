@@ -15,7 +15,7 @@ $formulario_ativo = in_array(
 <header class="bg-white border-bottom sticky-top">
     <nav class="navbar navbar-expand-lg" aria-label="Navegação principal">
         <section class="container-fluid px-3 px-lg-4">
-            <a class="navbar-brand d-flex align-items-center gap-2 fw-semibold" href="<?= base_url(); ?>"
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-semibold" href="<?= base_url('principal'); ?>"
                 aria-label="Vitae RH — página inicial">
                 <span class="d-inline-flex align-items-center justify-content-center bg-success text-white rounded p-2"
                     aria-hidden="true">
@@ -70,7 +70,7 @@ $formulario_ativo = in_array(
                         <a class="nav-link <?= $formulario_ativo ? 'active fw-semibold' : ''; ?>"
                             <?= $formulario_ativo ? 'aria-current="page"' : ''; ?>
                             href="<?= base_url('formulario'); ?>">
-                            Configuração do perfil
+                            Formulários
                         </a>
                     </li>
                     <?php endif; ?>

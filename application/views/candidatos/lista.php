@@ -80,22 +80,7 @@
                             <input class="form-control" id="data_fim" name="data_fim"
                                 type="date" value="<?= html_escape($filtros['data_fim']); ?>">
                         </div>
-                        <div class="col-12 col-lg-4">
-                            <label class="form-label" for="campo_chave">Campo configurável</label>
-                            <select class="form-select" id="campo_chave" name="campo_chave">
-                                <option value="">Todos os campos</option>
-                                <?php foreach ($campos_filtro as $chave => $nome): ?>
-                                    <option value="<?= html_escape($chave); ?>" <?= $filtros['campo_chave'] === $chave ? 'selected' : ''; ?>>
-                                        <?= html_escape($nome); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="col-12 col-lg-4">
-                            <label class="form-label" for="valor_campo">Valor do campo</label>
-                            <input class="form-control" id="valor_campo" name="valor_campo" maxlength="150"
-                                value="<?= html_escape($filtros['valor_campo']); ?>">
-                        </div>
+                        <?php $this->load->view('candidatos/filtros_campos'); ?>
                         <div class="col-12 col-sm-6 col-lg-1 d-grid">
                             <button class="btn btn-success" type="submit">
                                 <i class="fa-solid fa-filter" aria-hidden="true"></i>
@@ -103,7 +88,7 @@
                             </button>
                         </div>
                     </div>
-                    <?php if ($filtros['termo'] !== '' || $filtros['status'] !== '' || $filtros['situacao_seletiva'] !== '' || $filtros['campo_chave'] !== '' || $filtros['valor_campo'] !== '' || $filtros['data_inicio'] !== '' || $filtros['data_fim'] !== ''): ?>
+                    <?php if ($filtros['termo'] !== '' || $filtros['status'] !== '' || $filtros['situacao_seletiva'] !== '' || !empty($filtros['campos']) || $filtros['data_inicio'] !== '' || $filtros['data_fim'] !== ''): ?>
                         <div class="mt-3">
                             <a class="small" href="<?= base_url('candidatos'); ?>">Limpar filtros</a>
                         </div>
@@ -112,19 +97,7 @@
             </div>
         </section>
 
-        <?php if ($pode_comunicar && !empty($modelos_mensagem)): ?>
-            <form id="envio-lote" method="post" action="<?= base_url('candidatos/enviar-mensagem-lote'); ?>" class="card border shadow-sm mb-4">
-                <div class="card-body d-flex flex-column flex-md-row gap-3 align-items-md-end">
-                    <div class="flex-grow-1"><label class="form-label" for="modelo_lote">Enviar modelo aos selecionados</label>
-                        <select class="form-select" id="modelo_lote" name="modelo_codigo" required>
-                            <option value="">Selecione um modelo</option>
-                            <?php foreach ($modelos_mensagem as $modelo): ?><option value="<?= (int) $modelo['codigo']; ?>"><?= html_escape($modelo['nome']); ?></option><?php endforeach; ?>
-                        </select>
-                    </div>
-                    <button class="btn btn-success" type="submit">Enviar aos selecionados</button>
-                </div>
-            </form>
-        <?php endif; ?>
+
 
         <section aria-labelledby="lista-candidatos-title" class="card border shadow-sm">
             <div class="card-header bg-white py-3">
@@ -139,7 +112,7 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr class="small text-secondary text-uppercase">
-                                <?php if ($pode_comunicar && !empty($modelos_mensagem)): ?><th class="px-3 py-3"><span class="visually-hidden">Selecionar</span></th><?php endif; ?>
+
                                 <th class="px-3 py-3" scope="col">Candidato</th>
                                 <th class="py-3" scope="col">Telefone</th>
                                 <th class="py-3" scope="col">Cadastro</th>
@@ -150,7 +123,7 @@
                         <tbody>
                             <?php foreach ($candidatos as $candidato): ?>
                                 <tr>
-                                    <?php if ($pode_comunicar && !empty($modelos_mensagem)): ?><td class="px-3"><input class="form-check-input" form="envio-lote" type="checkbox" name="candidatos[]" value="<?= (int) $candidato['codigo']; ?>"></td><?php endif; ?>
+
                                     <td class="px-3">
                                         <a class="text-decoration-none text-body fw-semibold"
                                             href="<?= base_url('candidatos/detalhe/' . (int) $candidato['codigo']); ?>">

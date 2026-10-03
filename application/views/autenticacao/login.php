@@ -78,6 +78,10 @@
                                     Entrar
                                 </button>
                             </form>
+                            <div class="d-grid gap-2 mt-3">
+                                <a href="<?= base_url('recuperacao_usuario'); ?>">Esqueci minha senha</a>
+                                <a class="btn btn-outline-secondary" href="<?= base_url('candidato/login'); ?>">Sou candidato</a>
+                            </div>
 
                             <footer class="border-top text-center mt-4 pt-4">
                                 <p class="small text-secondary mb-0">
@@ -139,7 +143,7 @@
                     dataType: 'json'
                 }).done(function (response) {
                     if (response.sucesso) {
-                        window.location.href = base_url;
+                        window.location.href = base_url + 'principal';
                         return;
                     }
 

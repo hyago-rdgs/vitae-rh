@@ -123,26 +123,8 @@ class Candidato extends CI_Controller
 
     protected function buscar_publicacao_vigente()
     {
-        $formulario = $this->formulario_model->buscar();
-
-        if (!$formulario) {
-            return FALSE;
-        }
-
-        $publicacao_atual = $this->formulario_publicacao_model
-            ->buscar_atual($formulario['codigo']);
-
-        if (!$publicacao_atual) {
-            return FALSE;
-        }
-
-        $publicacao = $this->formulario_publicacao_model
-            ->buscar_por_codigo($publicacao_atual['codigo']);
-
-        if (!$publicacao) {
-            return FALSE;
-        }
-
+        $publicacao = $this->formulario_publicacao_model->buscar_vigente();
+        if (!$publicacao) return FALSE;
         $estrutura = json_decode($publicacao['estrutura'], TRUE);
 
         if (!$this->estrutura_valida($estrutura)) {
@@ -758,6 +740,10 @@ class Candidato extends CI_Controller
     private function salvar_cadastro($candidato, $respostas, $arquivos, $publicacao)
     {
         if (!$this->db->trans_begin()) {
+            return FALSE;
+        }
+        if (!$this->formulario_publicacao_model->conferir_vigente($publicacao['codigo'])) {
+            $this->db->trans_rollback();
             return FALSE;
         }
 

@@ -1,3 +1,4 @@
+<?php $rota_acesso = $rota_acesso ?? 'candidato'; ?>
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -26,7 +27,7 @@
                     <div class="alert alert-success" role="status">Se o e-mail estiver cadastrado, você receberá as instruções para redefinir a senha.</div>
                 <?php endif; ?>
 
-                <form method="post" action="<?= base_url($pagina === 'login' ? 'candidato/login' : ($pagina === 'recuperacao' ? 'candidato/recuperar' : 'candidato/redefinir/' . $link)); ?>">
+                <form method="post" action="<?= base_url($pagina === 'login' ? 'candidato/login' : ($pagina === 'recuperacao' ? $rota_acesso . '/recuperar' : $rota_acesso . '/redefinir/' . $link)); ?>">
                     <input type="hidden" name="token" value="<?= html_escape($token); ?>">
                     <?php if ($pagina !== 'redefinicao'): ?>
                         <div class="mb-3">
@@ -35,7 +36,7 @@
                                 value="<?= html_escape($email ?? ''); ?>">
                         </div>
                     <?php endif; ?>
-                    <?php if ($pagina !== 'recuperacao'): ?>
+                    <?php if ($pagina === 'redefinicao' || !empty($mostrar_senha)): ?>
                         <div class="mb-3">
                             <label class="form-label" for="senha"><?= $pagina === 'login' ? 'Senha' : 'Nova senha'; ?></label>
                             <input class="form-control" type="password" id="senha" name="senha"
@@ -51,15 +52,16 @@
                         </div>
                     <?php endif; ?>
                     <button class="btn btn-success w-100" type="submit">
-                        <?= $pagina === 'login' ? 'Entrar' : ($pagina === 'recuperacao' ? 'Solicitar link' : 'Salvar nova senha'); ?>
+                        <?= $pagina === 'login' ? (!empty($mostrar_senha) ? 'Entrar' : 'Continuar') : ($pagina === 'recuperacao' ? 'Solicitar link' : 'Salvar nova senha'); ?>
                     </button>
                 </form>
                 <div class="d-flex flex-wrap gap-3 mt-4">
                     <?php if ($pagina === 'login'): ?>
                         <a href="<?= base_url('candidato/recuperar'); ?>">Esqueci minha senha</a>
-                        <a href="<?= base_url('candidato/cadastro'); ?>">Criar perfil</a>
+                        <a class="btn btn-outline-success" href="<?= base_url('candidato/cadastro'); ?>">Criar perfil</a>
+                        <a class="btn btn-outline-secondary" href="<?= base_url('autenticacao/login'); ?>">Acesso administrativo</a>
                     <?php else: ?>
-                        <a href="<?= base_url('candidato/login'); ?>">Voltar para o acesso</a>
+                        <a href="<?= base_url($rota_acesso === 'recuperacao_usuario' ? 'autenticacao/login' : 'candidato/login'); ?>">Voltar para o acesso</a>
                     <?php endif; ?>
                 </div>
             </div>

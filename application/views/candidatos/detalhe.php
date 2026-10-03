@@ -115,24 +115,21 @@
                 <div class="card-header bg-white py-3"><h2 class="h6 fw-semibold mb-0" id="comunicacao-title">Enviar mensagem</h2></div>
                 <div class="card-body">
                     <form method="post" action="<?= base_url('candidatos/enviar-mensagem/' . (int) $candidato['codigo']); ?>" class="row g-3 align-items-end">
+                        <input type="hidden" name="_token_admin" value="<?= html_escape($this->token_admin->obter()); ?>">
                         <div class="col-12 col-md-8"><label class="form-label" for="modelo_codigo">Modelo</label>
                             <select class="form-select" id="modelo_codigo" name="modelo_codigo" required><option value="">Selecione um modelo</option>
                                 <?php foreach ($modelos_mensagem as $modelo): ?><option value="<?= (int) $modelo['codigo']; ?>"><?= html_escape($modelo['nome']); ?></option><?php endforeach; ?>
                             </select>
                         </div>
-                        <div class="col-12 col-md-4 d-grid"><button class="btn btn-success" type="submit">Enviar por e-mail</button></div>
+                        <div class="col-12 col-md-4 d-grid gap-2">
+                            <button class="btn btn-success" type="submit" name="canal" value="email">Enviar por e-mail</button>
+                            <button class="btn btn-outline-success" type="submit" name="canal" value="whatsapp" formtarget="_blank">Abrir no WhatsApp</button>
+                        </div>
                     </form>
                 </div>
             </section>
         <?php endif; ?>
 
-        <section class="card border shadow-sm mb-4" aria-labelledby="envios-title">
-            <div class="card-header bg-white py-3"><h2 class="h6 fw-semibold mb-0" id="envios-title">Mensagens enviadas</h2></div>
-            <?php if (empty($envios)): ?><div class="card-body"><p class="small text-body-secondary mb-0">Nenhuma mensagem enviada.</p></div>
-            <?php else: ?><div class="table-responsive"><table class="table table-sm align-middle mb-0"><thead class="table-light"><tr><th class="px-3">Modelo</th><th>Assunto</th><th>Status</th><th>Data</th></tr></thead><tbody>
-                <?php foreach ($envios as $envio): ?><tr><td class="px-3"><?= html_escape($envio['modelo_nome'] ?? 'Modelo removido'); ?></td><td><?= html_escape($envio['assunto']); ?></td><td><?= $envio['status'] === 'enviado' ? '<span class="badge text-bg-success">Enviado</span>' : '<span class="badge text-bg-danger">Erro</span>'; ?></td><td><?= html_escape(date('d/m/Y H:i', strtotime($envio['cadastro']))); ?></td></tr><?php endforeach; ?>
-            </tbody></table></div><?php endif; ?>
-        </section>
 
         <section class="card border shadow-sm mb-4" aria-labelledby="historico-title">
             <div class="card-header bg-white py-3">
@@ -168,29 +165,6 @@
             <?php endif; ?>
         </section>
 
-        <section class="card border shadow-sm mb-4" aria-labelledby="cadastro-title">
-            <div class="card-header bg-white py-3">
-                <h2 class="h6 fw-semibold mb-0" id="cadastro-title">Dados do cadastro</h2>
-            </div>
-            <div class="card-body">
-                <dl class="row mb-0">
-                    <dt class="col-sm-4 col-lg-3">Cadastrado em</dt>
-                    <dd class="col-sm-8 col-lg-9">
-                        <?= html_escape(date('d/m/Y H:i', strtotime($candidato['cadastro']))); ?>
-                    </dd>
-                    <dt class="col-sm-4 col-lg-3">Versão do formulário</dt>
-                    <dd class="col-sm-8 col-lg-9">v<?= (int) $formulario['formulario_versao']; ?></dd>
-                    <dt class="col-sm-4 col-lg-3">Consentimento LGPD</dt>
-                    <dd class="col-sm-8 col-lg-9">
-                        <?= $candidato['consentimento_lgpd'] ? 'Registrado' : 'Não registrado'; ?>
-                        <?php if (!empty($candidato['consentimento_lgpd_em'])): ?>
-                            · <?= html_escape(date('d/m/Y H:i', strtotime($candidato['consentimento_lgpd_em']))); ?>
-                            (<?= html_escape($candidato['consentimento_lgpd_versao']); ?>)
-                        <?php endif; ?>
-                    </dd>
-                </dl>
-            </div>
-        </section>
 
         <?php foreach ($estrutura['secoes'] as $secao): ?>
             <section class="card border shadow-sm mb-4" aria-labelledby="secao-<?= (int) $secao['codigo']; ?>">

@@ -12,6 +12,7 @@ class Formulario extends CI_Controller
         );
 
         $this->load->library('auditoria');
+        $this->load->library('token_admin');
         $this->load->database();
         $this->load->model('formulario_model');
         $this->load->model('formulario_secao_model');
@@ -23,13 +24,16 @@ class Formulario extends CI_Controller
 
     public function index()
     {
-        $this->configurar();
-        return;
+        if ($this->input->method() !== 'get') show_404();
+        $this->load->view('formulario/lista', [
+            'formularios' => $this->formulario_model->listar(),
+            'vigente' => $this->formulario_publicacao_model->buscar_vigente()
+        ]);
     }
 
-    public function configurar()
+    public function configurar($codigo = NULL)
     {
-        $formulario = $this->formulario_model->buscar();
+        $formulario = $this->formulario_model->buscar($codigo);
 
         if (!$formulario) {
             show_error(
@@ -40,6 +44,7 @@ class Formulario extends CI_Controller
         }
 
         if ($this->input->method() === 'post') {
+            $this->token_admin->exigir();
             $resultado = $this->validar($this->input->post());
 
             if (!$resultado['sucesso']) {
@@ -59,7 +64,7 @@ class Formulario extends CI_Controller
             );
 
             $formulario_atualizado = $atualizado
-                ? $this->formulario_model->buscar()
+                ? $this->formulario_model->buscar($formulario['codigo'])
                 : FALSE;
 
             $auditoria_salva = $formulario_atualizado
@@ -106,13 +111,13 @@ class Formulario extends CI_Controller
         );
     }
 
-    public function previsualizar()
+    public function previsualizar($codigo = NULL)
     {
         if ($this->input->method() !== 'get') {
             show_404();
         }
 
-        $formulario = $this->formulario_model->buscar();
+        $formulario = $this->formulario_model->buscar($codigo);
 
         if (!$formulario) {
             show_error(
@@ -128,6 +133,43 @@ class Formulario extends CI_Controller
             'formulario/formulario_previsualizacao',
             $dados
         );
+    }
+
+    public function versao($codigo = NULL)
+    {
+        if ($this->input->method() !== 'get' || !ctype_digit((string) $codigo)) show_404();
+        $publicacao = $this->formulario_publicacao_model->buscar_por_codigo((int) $codigo);
+        if (!$publicacao || !empty($publicacao['exclusao'])) show_404();
+        $estrutura = json_decode($publicacao['estrutura'], TRUE);
+        if (!is_array($estrutura) || empty($estrutura['secoes'])) show_error('Estrutura indisponível.', 422);
+        $dados = ['formulario' => $estrutura['formulario'], 'versao' => $publicacao['versao'],
+            'secoes' => [], 'grupos_por_secao' => [], 'campos_por_grupo' => [], 'opcoes_por_campo' => []];
+        foreach ($estrutura['secoes'] as $secao) {
+            $dados['secoes'][] = $secao + ['ativo' => 1];
+            foreach ($secao['grupos'] as $grupo) {
+                $dados['grupos_por_secao'][$secao['codigo']][] = $grupo + ['ativo' => 1];
+                foreach ($grupo['campos'] as $campo) {
+                    $dados['campos_por_grupo'][$grupo['codigo']][] = $campo + ['ativo' => 1];
+                    foreach ($campo['opcoes'] as $opcao) {
+                        $dados['opcoes_por_campo'][$campo['codigo']][] = $opcao + ['ativo' => 1];
+                    }
+                }
+            }
+        }
+        $this->load->view('formulario/formulario_previsualizacao', $dados);
+    }
+
+    public function cadastrar()
+    {
+        if ($this->input->method() !== 'post') show_404();
+        $this->token_admin->exigir();
+        $nome = $this->input->post('nome', TRUE);
+        if (!is_string($nome) || trim($nome) === '' || strlen(trim($nome)) > 100) {
+            show_error('Informe um nome com até 100 caracteres.', 422);
+        }
+        $codigo = $this->formulario_model->cadastrar(['nome' => trim($nome)]);
+        if (!$codigo) show_error('Não foi possível criar o formulário.', 500);
+        redirect('formulario/configurar/' . $codigo);
     }
 
     private function preparar_dados_estrutura($formulario)
@@ -158,6 +200,7 @@ class Formulario extends CI_Controller
 
         return [
             'formulario' => $formulario,
+            'proxima_versao' => $this->formulario_publicacao_model->proxima_versao($formulario['codigo']),
             'secoes' => $this->formulario_secao_model
                 ->listar_por_formulario($formulario['codigo']),
             'grupos_por_secao' => $grupos_por_secao,

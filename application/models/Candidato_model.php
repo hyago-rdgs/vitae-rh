@@ -113,34 +113,9 @@ class Candidato_model extends CI_Model
             $this->db->where('c.situacao_seletiva', $filtros['situacao_seletiva']);
         }
 
-        if (!empty($filtros['campo_chave']) && !empty($filtros['valor_campo'])) {
-            $campo = $this->db->escape($filtros['campo_chave']);
-            $valor = $this->db->escape('%' . $filtros['valor_campo'] . '%');
-            $this->db->where(
-                'EXISTS (
-                    SELECT 1
-                    FROM candidato_formularios cf_filtro
-                    INNER JOIN candidato_grupos cg_filtro
-                        ON cg_filtro.candidato_formulario_codigo = cf_filtro.codigo
-                    INNER JOIN candidato_respostas cr_filtro
-                        ON cr_filtro.candidato_grupo_codigo = cg_filtro.codigo
-                    WHERE cf_filtro.candidato_codigo = c.codigo
-                      AND cf_filtro.codigo = (
-                        SELECT MAX(cf_atual.codigo)
-                        FROM candidato_formularios cf_atual
-                        WHERE cf_atual.candidato_codigo = c.codigo
-                      )
-                      AND cr_filtro.campo_chave = ' . $campo . '
-                      AND (
-                        cr_filtro.valor_texto LIKE ' . $valor . '
-                        OR cr_filtro.valor_json LIKE ' . $valor . '
-                        OR CAST(cr_filtro.valor_numero AS CHAR) LIKE ' . $valor . '
-                        OR CAST(cr_filtro.valor_data AS CHAR) LIKE ' . $valor . '
-                      )
-                )',
-                NULL,
-                FALSE
-            );
+        if (!empty($filtros['campos'])) {
+            $this->load->model('candidato_filtro_model');
+            $this->candidato_filtro_model->aplicar($filtros['campos'], $this->candidato_filtro_model->campos());
         }
 
         if ($filtros['data_inicio'] !== '') {
